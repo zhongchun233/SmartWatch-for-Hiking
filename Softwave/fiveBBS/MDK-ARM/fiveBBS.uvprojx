@@ -190,7 +190,7 @@
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
-            <useUlib>1</useUlib>
+            <useUlib>0</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xE</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;..\Middlewares\easylogger\inc;..\Debug;..\Middlewares\SEEGGER\Config;..\Middlewares\SEEGGER\RTT</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;..\Middlewares\easylogger\inc;..\Debug;..\Middlewares\SEEGGER\Config;..\Middlewares\SEEGGER\RTT;..\BSP\Button;..\BSP\ili9341_LCD</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -588,6 +588,23 @@
         </Group>
         <Group>
           <GroupName>BSP</GroupName>
+          <Files>
+            <File>
+              <FileName>bsp_ili9341_LCD_drive.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\ili9341_LCD\bsp_ili9341_LCD_drive.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_ili9341_LCD_handle.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\ili9341_LCD\bsp_ili9341_LCD_handle.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_Button.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\Button\bsp_Button.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>Middlewares/Easylogger</GroupName>
