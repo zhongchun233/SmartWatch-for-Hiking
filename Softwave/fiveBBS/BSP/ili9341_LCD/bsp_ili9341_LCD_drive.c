@@ -50,14 +50,14 @@
 
 //******************************** Functions ********************************//
 
-static uint8_t st7789_write_command(bsp_st7789_driver_t * const driver_instance, const uint8_t cmd, uint32_t dataLength)
-{
-    driver_instance->p_st7789_basic_operation->pf_write_cs_pin(RESET_PIN);  //chip select
-    driver_instance->p_st7789_basic_operation->pf_write_dc_pin(RESET_PIN);
+//static uint8_t st7789_write_command(bsp_st7789_driver_t * const driver_instance, const uint8_t cmd, uint32_t dataLength)
+//{
+//    driver_instance->p_st7789_basic_operation->pf_write_cs_pin(RESET_PIN);  //chip select
+//    driver_instance->p_st7789_basic_operation->pf_write_dc_pin(RESET_PIN);
 
-    uint8_t dataSend = cmd;
-    driver_instance->p_st7789_basic_operation->pf_spi_transmit(&dataSend, 1);
+//    uint8_t dataSend = cmd;
+//    driver_instance->p_st7789_basic_operation->pf_spi_transmit(&dataSend, 1);
 
-    driver_instance->p_st7789_basic_operation->pf_write_cs_pin(SET_PIN);  //chip unselect
-    return 0;
-}
+//    driver_instance->p_st7789_basic_operation->pf_write_cs_pin(SET_PIN);  //chip unselect
+//    return 0;
+//}
