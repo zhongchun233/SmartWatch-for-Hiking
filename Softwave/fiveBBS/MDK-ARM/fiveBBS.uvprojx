@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xE</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;..\Middlewares\easylogger\inc;..\Debug;..\Middlewares\SEEGGER\Config;..\Middlewares\SEEGGER\RTT;..\BSP\Button;..\BSP\ili9341_LCD</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;..\Middlewares\easylogger\inc;..\Debug;..\Middlewares\SEEGGER\Config;..\Middlewares\SEEGGER\RTT;..\BSP\Button;..\BSP\ili9341_LCD;..\BSP\LED</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -603,6 +603,11 @@
               <FileName>bsp_Button.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BSP\Button\bsp_Button.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_LED.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\LED\bsp_LED.c</FilePath>
             </File>
           </Files>
         </Group>

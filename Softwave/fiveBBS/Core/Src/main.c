@@ -26,6 +26,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "Debug.h"
+#include "bsp_LED.h"  // 包含LED相关的宏定义、枚举类型、函数声明
+#include "bsp_Button.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -101,6 +103,8 @@ int main(void)
 
   /* Call init function for freertos objects (in cmsis_os2.c) */
   MX_FREERTOS_Init();
+  key_TaskHandle = osThreadNew(key_task_func, NULL, &key_Task_attributes);
+//  led_TaskHandle = osThreadNew(led_task_func, NULL, &led_Task_attributes);
 
   /* Start scheduler */
   osKernelStart();
