@@ -96,31 +96,29 @@ void key_task_func(void *argument)
     // 第一步：检查队列创建是否成功（队列创建失败会导致后续功能异常）
     if (NULL == key_queue || NULL == inter_key_queue)
     {
-        log_d("按键队列创建失败！\r\n");
+        log_d("key_queue created failed !\r\n");
         return; // 队列创建失败，任务直接退出
     } 
     else
     {
-        log_d("按键队列创建成功！\r\n");
+        log_d("key_queue created successfully !\r\n");
     }
 
     // 任务主循环（FreeRTOS任务必须包含无限循环，不可返回）
     for(;;)
     {
         // 调试打印：任务运行状态（可根据需求关闭，减少串口占用）
-			log_d("KEY is running:[%d] ms \r\n", HAL_GetTick());
+//			log_d("KEY is running:[%d] ms \r\n", HAL_GetTick());
 
         // 1. 从中断事件队列（inter_key_queue）接收数据（非阻塞：超时时间0ms，无数据立即返回）
         // 参数1：目标队列句柄（inter_key_queue，中断回调函数往此队列发事件）
         // 参数2：接收数据缓冲区（存储读取到的按键事件）
         // 参数3：超时时间（0ms=非阻塞，有数据则读，无数据则跳过）
-        if (pdTRUE == xQueueReceive(inter_key_queue,  
-                                   &(key_press_event), 
-                                   (TickType_t)0))
+        if (pdTRUE == xQueueReceive(inter_key_queue, &(key_press_event),(TickType_t)0))
         {
             // 调试打印：接收到的事件时间戳和当前系统时间
-            log_d("接收到按键事件，事件触发时间：[%d] ms \r\n", key_press_event.trigger_tick);
-            log_d("任务接收按键事件，当前系统时间：[%d] ms \r\n", HAL_GetTick());
+            log_d("key_press_event.trigger_tick = [%d]\r\n", key_press_event.trigger_tick);
+            log_d("inter_key_queue receive key event at [%d] tick \r\n", HAL_GetTick());
 
             // 1.1 状态机处理：根据事件边沿类型和当前状态（event_index）处理事件
             // 状态机逻辑：仅允许「初始态(0)→下降沿→状态1→上升沿→初始态(0)」的合法流程
@@ -128,13 +126,13 @@ void key_task_func(void *argument)
             // 异常情况1：初始态（event_index=0）下接收到上升沿事件（无先按下直接松开，非法）
             if (RASING == key_press_event.edge_type && 0 == event_index)
             {    
-                log_d("异常：未检测到按键按下，直接收到松开事件！\r\n");
+                log_d("key RASING fetched! error!\r\n");
             }
 
             // 合法流程1：初始态（event_index=0）下接收到下降沿事件（按键按下，进入状态1）
             if (FAILING == key_press_event.edge_type && 0 == event_index)
             {
-                log_d("检测到按键按下（下降沿），状态机进入[1]态\r\n");
+                log_d("key FAILING fetched! first\r\n");
                 event_index += 1; // 状态机索引更新为1（标记已捕获按下事件）
                 frist_trigger_tick = key_press_event.trigger_tick; // 记录按下时刻的时间戳
             }
@@ -142,12 +140,12 @@ void key_task_func(void *argument)
             // 合法流程2：状态1（event_index=1）下接收到上升沿事件（按键松开，完成一次按键周期）
             if (RASING == key_press_event.edge_type && 1 == event_index)
             {
-                log_d("检测到按键松开（上升沿），开始判定短按/长按\r\n");
+                log_d("key RASING after the falling \r\n");
 
                 // 1.1.1 抗误触判断：按下→松开的时间间隔<10ms，判定为误触（抖动），忽略该事件
                 if (key_press_event.trigger_tick - frist_trigger_tick < 10)
                 {
-                    log_d("误触：按键按下松开间隔<10ms，事件无效！当前时间：[%d] ms \r\n", HAL_GetTick());
+                    log_d("Invalid key fetched  at [%d] tick \r\n", HAL_GetTick());
                     event_index = 0; // 状态机重置为初始态，等待下一次合法事件
                     continue; // 跳过后续处理，直接进入下一次循环
                 }
@@ -165,12 +163,12 @@ void key_task_func(void *argument)
                     // 非阻塞发送（超时0ms）：队列满则发送失败
                     if (pdTRUE == xQueueSendToFront(key_queue, &key_result, 0))
                     {
-                        log_d("短按判定成功！结果已发送到key_queue，当前时间：[%d] ms \r\n", HAL_GetTick());
+                        log_d("key_result send short press successfully at [%d] tick \r\n", HAL_GetTick());
                         event_index = 0; // 状态机重置为初始态，准备下一次按键检测
                     }
                     else
                     {
-                        log_d("短按结果发送失败！key_queue队列满！当前时间：[%d] ms \r\n", HAL_GetTick());
+                        log_d("key_result send short press failed at [%d] tick \r\n", HAL_GetTick());
                     }
                 }
 
@@ -183,12 +181,12 @@ void key_task_func(void *argument)
                     // 将长按结果发送到key_queue
                     if (pdTRUE == xQueueSendToFront(key_queue, &key_result, 0))
                     {
-                        log_d("长按判定成功！结果已发送到key_queue，当前时间：[%d] ms \r\n", HAL_GetTick());
+                        log_d("key_result send long press successfully at [%d] tick \r\n", HAL_GetTick());
                         event_index = 0; // 状态机重置为初始态
                     }
                     else
                     {
-                        log_d("长按结果发送失败！key_queue队列满！当前时间：[%d] ms \r\n", HAL_GetTick());
+                        log_d("key_result send long press failed at [%d] tick \r\n", HAL_GetTick());
                     }
                 }
 
@@ -280,15 +278,15 @@ KEY_CALLBACK
 {
     // 静态变量：记录当前中断触发类型（仅初始化一次，断电前保持状态）
     // FALING_TYPE：下降沿触发（对应按键按下）；RASING_TYPE：上升沿触发（对应按键松开）
-    static uint32_t irq_type = FALING_TYPE;
+    static uint32_t irq_type = RASING_TYPE;
     
     /* 局部变量：FreeRTOS中断安全API专用，标记是否唤醒了更高优先级任务
      * 必须初始化（默认0），用于xQueueSendToFrontFromISR的第三个参数
      */
-    BaseType_t xHigherPrioritTaskWoken = pdFALSE;
-    
+    BaseType_t xHigherPrioritTaskWoken;
+    log_d("IN!!!!!!!!!!!!!!!!!\r\n");
     // ========== 分支1：当前为下降沿触发（按键按下事件） ==========
-    if (FALING_TYPE == irq_type)
+    if ( RASING_TYPE == irq_type)
     {
         // 定义按键按下事件结构体，存储事件类型和触发时间戳
         key_press_event_t key_press_event_1 = 
@@ -296,35 +294,21 @@ KEY_CALLBACK
             .edge_type    = FAILING,          // 事件类型：下降沿（按键按下）
             .trigger_tick = HAL_GetTick()     // 记录事件触发时间（系统运行毫秒数）
         };
-        
-        // 容错判断：检查队列是否已创建（避免空指针访问崩溃）
-        if (NULL == inter_key_queue)
+              
+        if ( NULL == inter_key_queue )
         {
-            log_d("按键事件队列未创建！触发时间：[%d] ms \r\n", HAL_GetTick());
+            log_d( "inter_key_queue not created at [%d] tick \r\n",HAL_GetTick());
         }        
-        else
+
+        if ( pdTRUE == xQueueSendToFrontFromISR(            inter_key_queue, 
+                                                         &key_press_event_1, 
+                                                    &xHigherPrioritTaskWoken ))
         {
-            /* 中断安全地向队列头部发送按键事件（FromISR后缀表示中断上下文专用）
-             * 参数1：目标队列句柄（inter_key_queue需提前通过xQueueCreate创建）
-             * 参数2：发送的数据（按键事件结构体）
-             * 参数3：是否唤醒更高优先级任务的标记
-             * 返回值：pdTRUE表示发送成功，pdFALSE表示队列满（事件丢失）
-             */
-            if (pdTRUE == xQueueSendToFrontFromISR(inter_key_queue, 
-                                                  &key_press_event_1, 
-                                                  &xHigherPrioritTaskWoken))
-            {
-                log_d("按键按下事件（下降沿）发送成功！触发时间：[%d] ms \r\n", HAL_GetTick());
-            }
-            else
-            {
-                // 可选：添加队列满时的异常处理（如丢弃 oldest 事件、打印警告等）
-                log_d("按键事件队列满！按下事件发送失败！时间：[%d] ms \r\n", HAL_GetTick());
-            }
+            log_d( "key_press_event send FALING_event successfully  at [%d] tick \r\n",  HAL_GetTick());
         }
 
         /* 1.1 更新中断触发类型标记：下一次中断切换为上升沿（捕获按键松开） */
-        irq_type = RASING_TYPE;
+        irq_type = FALING_TYPE;
 
         /* 1.2 重新配置GPIO中断触发方式：从下降沿改为上升沿
          * 注意：HAL_GPIO_Init会覆盖该引脚原配置，需完整填写Pin、Mode、Pull参数
@@ -333,11 +317,11 @@ KEY_CALLBACK
             
         GPIO_InitStruct.Pin = KEY_Pin;           // 按键对应的GPIO引脚（宏定义，需提前配置）
         GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING; // 中断模式：上升沿触发
-        GPIO_InitStruct.Pull = GPIO_PULLUP;      // 上拉电阻使能（按键未按下时引脚为高电平）
+        GPIO_InitStruct.Pull = GPIO_NOPULL;      // 上拉电阻使能（按键未按下时引脚为高电平）
         HAL_GPIO_Init(KEY_GPIO_Port, &GPIO_InitStruct); // 应用配置到硬件
     }
     // ========== 分支2：当前为上升沿触发（按键松开事件） ==========
-    else if (RASING_TYPE == irq_type)
+    else if (FALING_TYPE == irq_type)
     {
         // 定义按键松开事件结构体，存储事件类型和触发时间戳
         key_press_event_t key_press_event_2 = 
@@ -345,43 +329,32 @@ KEY_CALLBACK
             .edge_type    = RASING,           // 事件类型：上升沿（按键松开）
             .trigger_tick = HAL_GetTick()     // 记录事件触发时间（用于计算按键按下时长）
         };
-    
-        // 容错判断：检查队列是否已创建
-        if (NULL == inter_key_queue)
-        {
-            log_d("按键事件队列未创建！触发时间：[%d] ms \r\n", HAL_GetTick());
-        }        
-        else
-        {
+           
+
             /* 中断安全地向队列头部发送按键松开事件 */
-            if (pdTRUE == xQueueSendToFrontFromISR(inter_key_queue, 
-                                                  &key_press_event_2, 
-                                                  &xHigherPrioritTaskWoken))
-            {
-                log_d("按键松开事件（上升沿）发送成功！触发时间：[%d] ms \r\n", HAL_GetTick());
-            }
-            else
-            {
-                log_d("按键事件队列满！松开事件发送失败！时间：[%d] ms \r\n", HAL_GetTick());
-            }
+        if ( NULL == inter_key_queue )
+        {
+            log_d( "inter_key_queue not created at [%d] tick \r\n",  HAL_GetTick());
+        }        
+        if ( pdTRUE == xQueueSendToFrontFromISR(inter_key_queue, 
+                                                           &key_press_event_2, 
+                                                     &xHigherPrioritTaskWoken ))
+        {
+            log_d( "key_press_event send RASING_event successfully at [%d] tick \r\n", HAL_GetTick());
         }
+
         
         /* 1.1 更新中断触发类型标记：下一次中断切换回下降沿（捕获下一次按键按下） */
-        irq_type = FALING_TYPE;
+        irq_type = RASING_TYPE;
 
         /* 1.2 重新配置GPIO中断触发方式：从上升沿改回下降沿 */
         GPIO_InitTypeDef GPIO_InitStruct = {0};
             
         GPIO_InitStruct.Pin = KEY_Pin;           // 按键对应的GPIO引脚
         GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING; // 中断模式：下降沿触发
-        GPIO_InitStruct.Pull = GPIO_PULLUP;      // 上拉电阻使能（保持引脚默认高电平）
+        GPIO_InitStruct.Pull = GPIO_NOPULL;      // 上拉电阻使能（保持引脚默认高电平）
         HAL_GPIO_Init(KEY_GPIO_Port, &GPIO_InitStruct); // 应用配置到硬件
     }
 
-    /* 关键：中断退出前检查是否需要触发任务调度（FreeRTOS中断安全机制）
-     * 若xHigherPrioritTaskWoken为pdTRUE，表示队列操作唤醒了更高优先级任务
-     * 调用portYIELD_FROM_ISR触发上下文切换，确保高优先级任务及时执行
-     * （注：部分FreeRTOS移植版本需用portEND_SWITCHING_ISR，需根据实际移植调整）
-     */
-    portYIELD_FROM_ISR(xHigherPrioritTaskWoken);
+
 }

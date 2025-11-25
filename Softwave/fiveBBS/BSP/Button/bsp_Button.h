@@ -19,7 +19,7 @@
 
 //******************************** Includes *********************************//
 #define KEY_CALLBACK        void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-#define KEY_Pin GPIO_PIN_1
+#define KEY_Pin GPIO_PIN_0
 #define KEY_GPIO_Port GPIOA
 //*********************Thread_Func **********************//
 extern osThreadId_t key_TaskHandle;

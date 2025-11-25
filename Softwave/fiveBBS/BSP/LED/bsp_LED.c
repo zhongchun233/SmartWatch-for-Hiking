@@ -7,7 +7,7 @@
  * 
  * @par dependencies 
  * - bsp_led.h       // LED相关宏定义、枚举、函数声明（必须包含）
- * - stdio.h         // 标准输入输出（printf函数依赖）
+ * - stdio.h         // 标准输入输出（log_d函数依赖）
  * - stdint.h        // 标准整数类型（uint32_t等）
  * 
  * @author Jack | R&D Dept. | EternalChip 立芯嵌入式
@@ -27,17 +27,24 @@
  *****************************************************************************/
 
 #include "bsp_LED.h"  // 包含LED相关的宏定义、枚举类型、函数声明
-
+#include "debug.h"
+#include "bsp_Button.h"
 //******************************** 宏定义区 **********************************//
 
 //****************************************************************************//
 
 //********************* FreeRTOS任务相关定义 **********************//
 osThreadId_t led_TaskHandle;  // LED任务句柄（用于操作任务，如暂停、删除）
-
+osThreadId_t Green_led_TaskHandle;  // LED任务句柄（用于操作任务，如暂停、删除）
 // LED任务属性配置结构体（FreeRTOS任务创建必需）
 const osThreadAttr_t led_Task_attributes = {
   .name = "led_Task",          // 任务名称（调试用，便于识别）
+  .stack_size = 128 * 4,       // 任务栈大小：128字 × 4字节/字 = 512字节（足够LED控制逻辑）
+  .priority = (osPriority_t) osPriorityHigh,  // 任务优先级：高优先级（确保LED响应及时）
+};
+
+const osThreadAttr_t Green_led_Task_attributes = {
+  .name = "Green_led_Task",          // 任务名称（调试用，便于识别）
   .stack_size = 128 * 4,       // 任务栈大小：128字 × 4字节/字 = 512字节（足够LED控制逻辑）
   .priority = (osPriority_t) osPriorityHigh,  // 任务优先级：高优先级（确保LED响应及时）
 };
@@ -113,33 +120,31 @@ void led_task_func(void *argument)
     led_queue = xQueueCreate(10, sizeof(led_operation_t));
     if (NULL == led_queue)  // 检查队列创建是否成功
     {
-        printf("led_queue创建失败！\r\n");
+        log_d("led_queue created failed!\r\n");
     }
     else
     {
-        printf("led_queue创建成功！\r\n");
+        log_d("led_queue created successfully!\r\n");
     }
 
     // 任务主循环（FreeRTOS任务必须包含无限循环，不可退出）
     for (;;)
     {
-        printf("LED任务运行中...\r\n");  // 调试打印：任务存活状态（可按需关闭）
+
 
         // 检查队列句柄是否有效（避免空指针访问）
-        if (led_queue != 0)
+        if (key_queue != 0)
         {
             /* 2. 从LED队列接收消息（非阻塞模式）
              * 参数1：队列句柄（led_queue）
              * 参数2：接收数据缓冲区（存储读取到的LED操作指令）
              * 参数3：超时时间（0ms=非阻塞，无消息则立即返回）
              */
-            if (pdTRUE == xQueueReceive(led_queue, 
-                                       &(led_value), 
-                                       (TickType_t)0))
+
+            if (pdTRUE == xQueueReceive(key_queue,&(led_value),(TickType_t)0))
             {
                 // 调试打印：成功接收队列消息（指令值+当前系统时间）
-                printf("收到LED操作指令：[%d]，接收时间：[%d] ms \r\n", 
-                       led_value, HAL_GetTick());
+                log_d("received led_queue value = [%d] at time [%d]  \r\n",led_value, HAL_GetTick());
 
                 // 3. 调用LED核心操作函数，执行对应指令
                 led_ret = led_on_off(led_value);
@@ -147,16 +152,29 @@ void led_task_func(void *argument)
                 // 检查操作是否成功
                 if (LED_OK == led_ret)
                 {
-                    printf("LED操作执行成功！执行时间：[%d] ms \r\n", HAL_GetTick());
+                    log_d("led_on_off successfully at time [%d] \r\n", HAL_GetTick());
                 }
             }
+						else{
+//											  log_d("led_queue fail \r\n"); 
+						}
         }
 
-        osDelay(100);  // 任务延时100ms（降低CPU占用率，FreeRTOS标准延时函数）
+        osDelay(1000);  // 任务延时100ms（降低CPU占用率，FreeRTOS标准延时函数）
     }
     /* USER CODE END 5 */
 }
+void Green_led_task_func(void *argument)
+{
+	for(;;)
+	{
+		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
+		osDelay(1000);	
+	
+	}
 
+
+}
 //******************************** 宏定义区 **********************************//
 // （文件末尾无额外宏定义，此处为格式对齐）
 //****************************************************************************//
