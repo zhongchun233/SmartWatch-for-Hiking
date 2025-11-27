@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xE</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../Middlewares/easylogger/inc;../Debug;../Middlewares/SEEGGER/Config;../Middlewares/SEEGGER/RTT;../BSP/Button;../BSP/ili9341_LCD;../BSP/LED;..\Middlewares\Function</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../Middlewares/easylogger/inc;../Debug;../Middlewares/SEEGGER/Config;../Middlewares/SEEGGER/RTT;../BSP/Button;../BSP/ili9341_LCD;../BSP/LED;../Middlewares/Function;..\BSP\Platform_Interface\Button;..\Platform</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -600,14 +600,14 @@
               <FilePath>..\BSP\ili9341_LCD\bsp_ili9341_LCD_handle.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_Button.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\BSP\Button\bsp_Button.c</FilePath>
-            </File>
-            <File>
               <FileName>bsp_LED.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BSP\LED\bsp_LED.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_multi_button.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\Button\bsp_multi_button.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -663,6 +663,26 @@
               <FileName>circular_buffer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Middlewares\Function\circular_buffer.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>BSP/Platform_Interface</GroupName>
+          <Files>
+            <File>
+              <FileName>bsp_adaper_port_button.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\Platform_Interface\Button\bsp_adaper_port_button.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>APP/User_App</GroupName>
+          <Files>
+            <File>
+              <FileName>user_periph_setup.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Platform\user_periph_setup.c</FilePath>
             </File>
           </Files>
         </Group>

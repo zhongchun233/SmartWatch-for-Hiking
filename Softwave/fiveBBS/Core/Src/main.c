@@ -26,8 +26,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "Debug.h"
-#include "bsp_LED.h"  
-#include "bsp_Button.h"
+#include "bsp_LED.h" 
+#include "user_periph_setup.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -96,7 +96,7 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 	Debug_Init();
-	  key_TaskHandle = osThreadNew(key_task_func, NULL, &key_Task_attributes);
+	app_periph_init();
   led_TaskHandle = osThreadNew(led_task_func, NULL, &led_Task_attributes);
 //	Green_led_TaskHandle = osThreadNew(Green_led_task_func, NULL, &Green_led_Task_attributes);
 

@@ -27,9 +27,7 @@
  *****************************************************************************/
 
 #include "bsp_LED.h"  // 包含LED相关的宏定义、枚举类型、函数声明
-#include "debug.h"
-#include "bsp_Button.h"
-//******************************** 宏定义区 **********************************//
+#include "debug.h" //******************************** 宏定义区 **********************************//
 
 //****************************************************************************//
 
@@ -133,7 +131,7 @@ void led_task_func(void *argument)
 
 
         // 检查队列句柄是否有效（避免空指针访问）
-        if (key_queue != 0)
+        if (led_queue != 0)
         {
             /* 2. 从LED队列接收消息（非阻塞模式）
              * 参数1：队列句柄（led_queue）
@@ -141,7 +139,7 @@ void led_task_func(void *argument)
              * 参数3：超时时间（0ms=非阻塞，无消息则立即返回）
              */
 
-            if (pdTRUE == xQueueReceive(key_queue,&(led_value),(TickType_t)0))
+            if (pdTRUE == xQueueReceive(led_queue,&(led_value),(TickType_t)0))
             {
                 // 调试打印：成功接收队列消息（指令值+当前系统时间）
                 log_d("received led_queue value = [%d] at time [%d]  \r\n",led_value, HAL_GetTick());
