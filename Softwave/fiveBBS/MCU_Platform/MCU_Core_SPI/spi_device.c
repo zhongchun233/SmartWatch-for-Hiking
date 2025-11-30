@@ -25,12 +25,15 @@
  * 
  *****************************************************************************/
 //******************************** Includes *********************************//
-#include "spi_port.h"
-#include "main.h"
+#include "Protocol_driver_Port.h"
+
 #include "spi.h"   // hardware i2c
-#include "os_freertos.h"
+
+
 #include "osal_mutex.h"
-#include "cmsis_os2.h"
+#include "osal_internal_mutex.h"
+#include "osal_heap.h"
+
 //******************************** Includes *********************************//
 
 //******************************** Defines **********************************//
@@ -38,57 +41,189 @@
 //******************************** Defines **********************************//
 
 //******************************** Variables ********************************//
-// 结构体重定义
-static st_spi_port_t st_spi_port[CORE_SPI_BUS_MAX] = {
-    [CORE_SPI_BUS_1] = {
-        .st_SPI_HandleTypeDef = &hspi1,
-        .cs_port = SPI_CS_GPIO_Port,
-        .cs_pin = SPI_CS_Pin
-    },
-    [CORE_SPI_BUS_2] = {
-        .st_SPI_HandleTypeDef = &hspi2,
-        .cs_port = LCD_CS_GPIO_Port,
-        .cs_pin = LCD_CS_Pin
+
+
+// SPI设备的方法实现
+static int spi_device_init(BaseDevice* self, void* config) {
+    SPIDevice* spi_dev = (SPIDevice*)self;
+    SPIConfig* cfg = (SPIConfig*)config;
+    
+    if (!spi_dev || !cfg) {
+        return-1;
     }
-};
-
-// SPI基础传输函数
-en_core_spi_status_t core_spi_transmit(en_core_spi_bus_t bus, uint8_t *data, uint16_t size, uint32_t timeout) {
-    HAL_StatusTypeDef ret = HAL_SPI_Transmit(st_spi_port[bus].st_SPI_HandleTypeDef, data, size, timeout);
-    return (ret == HAL_OK) ? CORE_SPI_OK : CORE_SPI_ERROR;
+    
+    // 初始化SPI设备特定数据
+    spi_dev->spi_handle = cfg->spi_handle;
+    spi_dev->cs_port = cfg->cs_port;
+    spi_dev->cs_pin = cfg->cs_pin;
+    spi_dev->timeout_ms = cfg->timeout_ms;
+    
+		
+    // 初始化CS引脚
+		GPIO_device_InitTypeDef SPI_device_CS;
+		SPI_device_CS.Mode = GPIO_MODE_OUTPUT_PP;
+		SPI_device_CS.Pin = spi_dev->cs_pin;
+		SPI_device_CS.Pull = GPIO_NOPULL;
+		SPI_device_CS.Speed = GPIO_SPEED_FREQ_HIGH;
+		GPIO_device_Init(spi_dev->cs_port, &SPI_device_CS);
+    GPIO_device_WritePin(spi_dev->cs_port, spi_dev->cs_pin, GPIO_device_PIN_SET);
+    
+    self->state = DEVICE_STATE_READY;
+    return 0;
 }
 
-// SPI基础传输函数
-en_core_spi_status_t core_spi_receive(en_core_spi_bus_t bus, uint8_t *data, uint16_t size, uint32_t timeout) {
-    HAL_StatusTypeDef ret = HAL_SPI_Receive(st_spi_port[bus].st_SPI_HandleTypeDef, data, size, timeout);
-    return (ret == HAL_OK) ? CORE_SPI_OK : CORE_SPI_ERROR;
-}
-// SPI基础传输函数
-en_core_spi_status_t core_spi_transmit_dma(en_core_spi_bus_t bus, uint8_t *data, uint16_t size) {
-    HAL_StatusTypeDef ret = HAL_SPI_Transmit_DMA(st_spi_port[bus].st_SPI_HandleTypeDef, data, size);
-    return (ret == HAL_OK) ? CORE_SPI_OK : CORE_SPI_ERROR;
-}
-
-// SPI基础传输函数
-en_core_spi_status_t core_spi_write_cs(en_core_spi_bus_t bus, uint8_t pinState) {
-	en_core_spi_status_t ret = CORE_SPI_OK;
-    if(0 == pinState)
-	{
-		HAL_GPIO_WritePin(st_spi_port[bus].cs_port, st_spi_port[bus].cs_pin, GPIO_PIN_RESET);
-	}
-	else
-	{
-		HAL_GPIO_WritePin(st_spi_port[bus].cs_port, st_spi_port[bus].cs_pin, GPIO_PIN_SET);
-	}
-    return (ret == HAL_OK) ? CORE_SPI_OK : CORE_SPI_ERROR;
+static int spi_device_deinit(BaseDevice* self) {
+    SPIDevice* spi_dev = (SPIDevice*)self;
+    
+    if (!spi_dev) {
+        return-1;
+    }
+    
+    // 释放CS引脚
+    GPIO_device_WritePin(spi_dev->cs_port, spi_dev->cs_pin, GPIO_device_PIN_SET);
+    
+    self->state = DEVICE_STATE_UNINIT;
+    return 0;
 }
 
-// SPI片选控制的传输
-en_core_spi_status_t core_spi_write_with_cs(en_core_spi_bus_t bus, uint8_t *data, uint16_t size) {
-    HAL_GPIO_WritePin(st_spi_port[bus].cs_port, st_spi_port[bus].cs_pin, GPIO_PIN_RESET);
-    HAL_StatusTypeDef ret = HAL_SPI_Transmit(st_spi_port[bus].st_SPI_HandleTypeDef, data, size, 100);
-    HAL_GPIO_WritePin(st_spi_port[bus].cs_port, st_spi_port[bus].cs_pin, GPIO_PIN_SET);
-    return (ret == HAL_OK) ? CORE_SPI_OK : CORE_SPI_ERROR;
+static int spi_device_read(BaseDevice* self, uint8_t* buffer, size_t length) {
+    SPIDevice* spi_dev = (SPIDevice*)self;
+    HAL_StatusTypeDef status;
+    
+    if (!spi_dev || !buffer || length == 0) {
+        return-1;
+    }
+    
+    if (self->state != DEVICE_STATE_READY) {
+        return-2;
+    }
+    
+    self->state = DEVICE_STATE_BUSY;
+    
+    // 片选拉低
+    GPIO_device_WritePin(spi_dev->cs_port, spi_dev->cs_pin, GPIO_device_PIN_RESET);
+    
+    // SPI读取
+    status = HAL_SPI_Receive((SPI_HandleTypeDef*)spi_dev->spi_handle, buffer, length, 
+                             spi_dev->timeout_ms);
+    
+    // 片选拉高
+    GPIO_device_WritePin(spi_dev->cs_port, spi_dev->cs_pin, GPIO_device_PIN_SET);
+    
+    self->state = DEVICE_STATE_READY;
+    
+    if (status != HAL_OK) {
+        self->state = DEVICE_STATE_ERROR;
+        self->error_code = status;
+        return-3;
+    }
+    
+    return length;
+}
+
+static int spi_device_write(BaseDevice* self, const uint8_t* data, size_t length) {
+    SPIDevice* spi_dev = (SPIDevice*)self;
+    HAL_StatusTypeDef status;
+    
+    if (!spi_dev || !data || length == 0) {
+        return-1;
+    }
+    
+    if (self->state != DEVICE_STATE_READY) {
+        return-2;
+    }
+    
+    self->state = DEVICE_STATE_BUSY;
+    
+    // 片选拉低
+    GPIO_device_WritePin(spi_dev->cs_port, spi_dev->cs_pin, GPIO_device_PIN_RESET);
+    
+    // SPI写入
+    status = HAL_SPI_Transmit((SPI_HandleTypeDef*)spi_dev->spi_handle, (uint8_t*)data, length, 
+                              spi_dev->timeout_ms);
+    
+    // 片选拉高
+    GPIO_device_WritePin(spi_dev->cs_port, spi_dev->cs_pin, GPIO_device_PIN_SET);
+    
+    self->state = DEVICE_STATE_READY;
+    
+    if (status != HAL_OK) {
+        self->state = DEVICE_STATE_ERROR;
+        self->error_code = status;
+        return-3;
+    }
+    
+    return length;
+}
+
+static int spi_device_ioctl(BaseDevice* self, IOCTL_CMD cmd, void* arg) {
+    SPIDevice* spi_dev = (SPIDevice*)self;
+    
+    switch (cmd) {
+        case SPI_IOCTL_SET_TIMEOUT:
+            if (arg) {
+                spi_dev->timeout_ms = *(uint32_t*)arg;
+                return 0;
+            }
+            break;
+        case SPI_IOCTL_GET_TIMEOUT:
+            if (arg) {
+                *(uint32_t*)arg = spi_dev->timeout_ms;
+                return 0;
+            }
+            break;
+        default:
+            return-1;
+    }
+    return-1;
+}
+
+static void spi_device_destroy(BaseDevice* self) {
+    if (self) {
+        spi_device_deinit(self);
+        osal_heap_free(self);
+    }
+}
+
+// SPI设备创建函数（构造函数）
+BaseDevice* spi_device_create(SPIConfig* config) {
+	
+SPIDevice* spi_dev = (SPIDevice*)osal_heap_malloc(sizeof(SPIDevice));
+    
+    if (!spi_dev) {
+				log_e("spi_device_create: create spi_dev failed ");
+        return NULL;
+    }
+    
+    // 初始化基类成员
+    memset(spi_dev, 0, sizeof(SPIDevice));
+    spi_dev->base.type = DEVICE_TYPE_SPI;
+    spi_dev->base.state = DEVICE_STATE_UNINIT;
+    spi_dev->base.id = 0;
+    spi_dev->base.error_code = 0;
+    
+    // 绑定虚函数（方法重写）
+    spi_dev->base.init = spi_device_init;
+    spi_dev->base.deinit = spi_device_deinit;
+    spi_dev->base.read = spi_device_read;
+    spi_dev->base.write = spi_device_write;
+    spi_dev->base.ioctl = spi_device_ioctl;
+    spi_dev->base.destroy = spi_device_destroy;
+    int32_t ret = osal_mutex_create(&spi_dev->base.Device_mutex);
+		if (ret != OSAL_SUCCESS) {
+        log_e("spi_device_create: create mutex failed ");
+        osal_heap_free(spi_dev);  // 回滚内存，避免泄漏
+        return NULL;
+    }
+    // 初始化SPI特定数据
+    if (config) {
+        spi_dev->spi_handle = config->spi_handle;
+        spi_dev->cs_port = config->cs_port;
+        spi_dev->cs_pin = config->cs_pin;
+        spi_dev->timeout_ms = config->timeout_ms;
+    }
+    
+    return (BaseDevice*)spi_dev;
 }
 
 

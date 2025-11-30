@@ -1,6 +1,5 @@
 #include "delay.h"
-#include "sys.h"
- 
+ #include "stm32f1xx_hal.h"
 /* 
 //roughly delay
 void delay_us(u32 nus)
@@ -19,7 +18,7 @@ void delay_ms(u16 nms)
 	for(i=0;i<nms;i++) delay_us(1000);
 }
 */
-
+#define SYS_CLK 		100
 void delay_init(void)
 {
 	HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
@@ -28,7 +27,7 @@ void delay_init(void)
 }
 
 #if OS_SUPPORT 						    								   
-void delay_us(u32 nus)
+void delay_us(uint32_t nus)
 {		
 	u32 ticks;
 	u32 told,tnow,tcnt=0;
@@ -50,7 +49,7 @@ void delay_us(u32 nus)
 	delay_osschedunlock();															    
 }  
 
-void delay_ms(u16 nms)
+void delay_ms(uint16_t nms)
 {	
 	if(delay_osrunning&&delay_osintnesting==0)    
 	{		 
@@ -60,15 +59,15 @@ void delay_ms(u16 nms)
 		}
 		nms%=fac_ms;						 
 	}
-	delay_us((u32)(nms*1000));			
+	delay_us((uint32_t)(nms*1000));			
 }
 #else  
 	 
-void delay_us(u32 nus)
+void delay_us(uint32_t nus)
 {		
-	u32 ticks;
-	u32 told,tnow,tcnt=0;
-	u32 reload=SysTick->LOAD;				    	 
+	uint32_t ticks;
+	uint32_t told,tnow,tcnt=0;
+	uint32_t reload=SysTick->LOAD;				    	 
 	ticks=nus*SYS_CLK; 						
 	told=SysTick->VAL;        				
 	while(1)
@@ -84,9 +83,9 @@ void delay_us(u32 nus)
 	}
 }
 
-void delay_ms(u16 nms)
+void delay_ms(uint16_t nms)
 {
-	u32 i;
+	uint32_t i;
 	for(i=0;i<nms;i++) delay_us(1000);
 }
 #endif

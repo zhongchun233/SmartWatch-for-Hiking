@@ -25,8 +25,7 @@
  * 
  *****************************************************************************/
 //******************************** Includes *********************************//
-#include "spi_port.h"
-#include "main.h"
+#include "Protocol_driver_Port.h"
 #include "spi.h"   // hardware i2c
 #include "os_freertos.h"
 #include "osal_mutex.h"
@@ -39,57 +38,24 @@
 
 //******************************** Variables ********************************//
 // 结构体重定义
-static st_spi_port_t st_spi_port[CORE_SPI_BUS_MAX] = {
-    [CORE_SPI_BUS_1] = {
-        .st_SPI_HandleTypeDef = &hspi1,
-        .cs_port = SPI_CS_GPIO_Port,
-        .cs_pin = SPI_CS_Pin
-    },
-    [CORE_SPI_BUS_2] = {
-        .st_SPI_HandleTypeDef = &hspi2,
-        .cs_port = LCD_CS_GPIO_Port,
-        .cs_pin = LCD_CS_Pin
-    }
-};
-
-// SPI基础传输函数
-en_core_spi_status_t core_spi_transmit(en_core_spi_bus_t bus, uint8_t *data, uint16_t size, uint32_t timeout) {
-    HAL_StatusTypeDef ret = HAL_SPI_Transmit(st_spi_port[bus].st_SPI_HandleTypeDef, data, size, timeout);
-    return (ret == HAL_OK) ? CORE_SPI_OK : CORE_SPI_ERROR;
+void  GPIO_device_Init(GPIO_device_TypeDef  *GPIOx, GPIO_device_InitTypeDef *GPIO_Init)
+{
+		GPIO_device_Init(GPIOx,GPIO_Init);
 }
-
-// SPI基础传输函数
-en_core_spi_status_t core_spi_receive(en_core_spi_bus_t bus, uint8_t *data, uint16_t size, uint32_t timeout) {
-    HAL_StatusTypeDef ret = HAL_SPI_Receive(st_spi_port[bus].st_SPI_HandleTypeDef, data, size, timeout);
-    return (ret == HAL_OK) ? CORE_SPI_OK : CORE_SPI_ERROR;
+void  GPIO_device_DeInit(GPIO_device_TypeDef  *GPIOx, uint32_t GPIO_Pin)
+{
+		GPIO_device_DeInit(GPIOx,GPIO_Pin);
 }
-// SPI基础传输函数
-en_core_spi_status_t core_spi_transmit_dma(en_core_spi_bus_t bus, uint8_t *data, uint16_t size) {
-    HAL_StatusTypeDef ret = HAL_SPI_Transmit_DMA(st_spi_port[bus].st_SPI_HandleTypeDef, data, size);
-    return (ret == HAL_OK) ? CORE_SPI_OK : CORE_SPI_ERROR;
+GPIO_device_PinState GPIO_device_ReadPin(GPIO_device_TypeDef *GPIOx, uint16_t GPIO_Pin)
+{
+		return GPIO_device_ReadPin(GPIOx, GPIO_Pin);
 }
-
-// SPI基础传输函数
-en_core_spi_status_t core_spi_write_cs(en_core_spi_bus_t bus, uint8_t pinState) {
-	en_core_spi_status_t ret = CORE_SPI_OK;
-    if(0 == pinState)
-	{
-		HAL_GPIO_WritePin(st_spi_port[bus].cs_port, st_spi_port[bus].cs_pin, GPIO_PIN_RESET);
-	}
-	else
-	{
-		HAL_GPIO_WritePin(st_spi_port[bus].cs_port, st_spi_port[bus].cs_pin, GPIO_PIN_SET);
-	}
-    return (ret == HAL_OK) ? CORE_SPI_OK : CORE_SPI_ERROR;
+void GPIO_device_WritePin(GPIO_device_TypeDef *GPIOx, uint16_t GPIO_Pin, GPIO_device_PinState PinState)
+{
+	GPIO_device_WritePin( GPIOx,  GPIO_Pin,  PinState);
 }
+void GPIO_device_TogglePin(GPIO_device_TypeDef *GPIOx, uint16_t GPIO_Pin)
+{
+	GPIO_device_TogglePin( GPIOx, GPIO_Pin);
 
-// SPI片选控制的传输
-en_core_spi_status_t core_spi_write_with_cs(en_core_spi_bus_t bus, uint8_t *data, uint16_t size) {
-    HAL_GPIO_WritePin(st_spi_port[bus].cs_port, st_spi_port[bus].cs_pin, GPIO_PIN_RESET);
-    HAL_StatusTypeDef ret = HAL_SPI_Transmit(st_spi_port[bus].st_SPI_HandleTypeDef, data, size, 100);
-    HAL_GPIO_WritePin(st_spi_port[bus].cs_port, st_spi_port[bus].cs_pin, GPIO_PIN_SET);
-    return (ret == HAL_OK) ? CORE_SPI_OK : CORE_SPI_ERROR;
 }
-
-
-

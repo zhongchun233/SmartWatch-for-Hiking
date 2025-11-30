@@ -103,7 +103,7 @@ static void userTaskInitFunction(void *argument)
     ret = osal_mutex_create(&sensor_i2c_mutex_handler);
     if(OSAL_SUCCESS == ret)
     {
-      core_i2c_register_mutex(0,sensor_i2c_mutex_handler);
+//      core_i2c_register_mutex(0,sensor_i2c_mutex_handler);
 #ifdef DEBUG_User_Init
       DEBUG_OUT("i2c mutex creat success");
 #endif

@@ -202,6 +202,22 @@
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
+        <Bp>
+          <Number>3</Number>
+          <Type>0</Type>
+          <LineNumber>175</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\BSP\LED\bsp_LED.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
       </Breakpoint>
       <Tracepoint>
         <THDelay>0</THDelay>
@@ -277,7 +293,7 @@
 
   <Group>
     <GroupName>Application/User/Core</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1020,7 +1036,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Middlewares\Function\circular_buffer.c</PathWithFileName>
+      <PathWithFileName>..\Middlewares\Function\circular_buffer\circular_buffer.c</PathWithFileName>
       <FilenameWithoutPath>circular_buffer.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1252,7 +1268,7 @@
   </Group>
 
   <Group>
-    <GroupName>MCU_Platform/Device_adaper_Port</GroupName>
+    <GroupName>MCU_Platform/Protocol_Port</GroupName>
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -1264,8 +1280,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\MCU_Platform\MCU_Core_GPIO\gpio_port.c</PathWithFileName>
-      <FilenameWithoutPath>gpio_port.c</FilenameWithoutPath>
+      <PathWithFileName>..\MCU_Platform\MCU_Core_SPI\spi_device.c</PathWithFileName>
+      <FilenameWithoutPath>spi_device.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1276,8 +1292,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\MCU_Platform\MCU_Core_IIC\i2c_port.c</PathWithFileName>
-      <FilenameWithoutPath>i2c_port.c</FilenameWithoutPath>
+      <PathWithFileName>..\MCU_Platform\MCU_Core_soft_IIC\soft_i2c_device.c</PathWithFileName>
+      <FilenameWithoutPath>soft_i2c_device.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1288,8 +1304,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\MCU_Platform\MCU_Core_SPI\spi_port.c</PathWithFileName>
-      <FilenameWithoutPath>spi_port.c</FilenameWithoutPath>
+      <PathWithFileName>..\MCU_Platform\MCU_Core_IIC\i2c_device.c</PathWithFileName>
+      <FilenameWithoutPath>i2c_device.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1300,8 +1316,44 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\MCU_Platform\Protocol_adaper_Port\Protocol_adaper_Port.c</PathWithFileName>
-      <FilenameWithoutPath>Protocol_adaper_Port.c</FilenameWithoutPath>
+      <PathWithFileName>..\MCU_Platform\MCU_Core_GPIO\gpio_device.c</PathWithFileName>
+      <FilenameWithoutPath>gpio_device.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>13</GroupNumber>
+      <FileNumber>80</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\MCU_Platform\MCU_Core_Uart\uart_device.c</PathWithFileName>
+      <FilenameWithoutPath>uart_device.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>13</GroupNumber>
+      <FileNumber>81</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\MCU_Platform\MCU_Core_delay\delay.c</PathWithFileName>
+      <FilenameWithoutPath>delay.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>13</GroupNumber>
+      <FileNumber>82</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\MCU_Platform\Protocol_driver_Port\Protocol_driver_Port.c</PathWithFileName>
+      <FilenameWithoutPath>Protocol_driver_Port.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

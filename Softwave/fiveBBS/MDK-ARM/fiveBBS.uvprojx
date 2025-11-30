@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xE</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../Middlewares/easylogger/inc;../Debug;../Middlewares/SEEGGER/Config;../Middlewares/SEEGGER/RTT;../BSP/Button;../BSP/ili9341_LCD;../BSP/LED;../Middlewares/Function;../BSP/Platform_Interface/Button;../APP_Platform/User_Init;../OS_Platform/OS_Wrapper/inc;../OS_Platform/OS_Implementation/FreeRTOS/inc;../Middlewares/os_adapter/inc;../APP_Platform/User_Init/Platform_IO_Register;../APP_Platform/User_Init/User_Task_Config;../MCU_Platform/MCU_Core_GPIO;../MCU_Platform/MCU_Core_IIC;../MCU_Platform/MCU_Core_SPI;../MCU_Platform/Protocol_adaper_Port</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../Middlewares/easylogger/inc;../Debug;../Middlewares/SEEGGER/Config;../Middlewares/SEEGGER/RTT;../BSP/Button;../BSP/ili9341_LCD;../BSP/LED;../Middlewares/Function;../BSP/Platform_Interface/Button;../APP_Platform/User_Init;../OS_Platform/OS_Wrapper/inc;../OS_Platform/OS_Implementation/FreeRTOS/inc;../Middlewares/os_adapter/inc;../APP_Platform/User_Init/Platform_IO_Register;../APP_Platform/User_Init/User_Task_Config;../MCU_Platform/MCU_Core_GPIO;../MCU_Platform/MCU_Core_IIC;../MCU_Platform/MCU_Core_SPI;..\MCU_Platform\Protocol_driver_Port;..\MCU_Platform\MCU_Core_soft_IIC;..\MCU_Platform\MCU_Core_delay;..\MCU_Platform\MCU_Core_Uart</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1324,7 +1324,7 @@
             <File>
               <FileName>circular_buffer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Middlewares\Function\circular_buffer.c</FilePath>
+              <FilePath>..\Middlewares\Function\circular_buffer\circular_buffer.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1429,27 +1429,42 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>MCU_Platform/Device_adaper_Port</GroupName>
+          <GroupName>MCU_Platform/Protocol_Port</GroupName>
           <Files>
             <File>
-              <FileName>gpio_port.c</FileName>
+              <FileName>spi_device.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\MCU_Platform\MCU_Core_GPIO\gpio_port.c</FilePath>
+              <FilePath>..\MCU_Platform\MCU_Core_SPI\spi_device.c</FilePath>
             </File>
             <File>
-              <FileName>i2c_port.c</FileName>
+              <FileName>soft_i2c_device.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\MCU_Platform\MCU_Core_IIC\i2c_port.c</FilePath>
+              <FilePath>..\MCU_Platform\MCU_Core_soft_IIC\soft_i2c_device.c</FilePath>
             </File>
             <File>
-              <FileName>spi_port.c</FileName>
+              <FileName>i2c_device.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\MCU_Platform\MCU_Core_SPI\spi_port.c</FilePath>
+              <FilePath>..\MCU_Platform\MCU_Core_IIC\i2c_device.c</FilePath>
             </File>
             <File>
-              <FileName>Protocol_adaper_Port.c</FileName>
+              <FileName>gpio_device.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\MCU_Platform\Protocol_adaper_Port\Protocol_adaper_Port.c</FilePath>
+              <FilePath>..\MCU_Platform\MCU_Core_GPIO\gpio_device.c</FilePath>
+            </File>
+            <File>
+              <FileName>uart_device.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MCU_Platform\MCU_Core_Uart\uart_device.c</FilePath>
+            </File>
+            <File>
+              <FileName>delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MCU_Platform\MCU_Core_delay\delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>Protocol_driver_Port.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MCU_Platform\Protocol_driver_Port\Protocol_driver_Port.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1472,5 +1487,14 @@
     </components>
     <files/>
   </RTE>
+
+  <LayerInfo>
+    <Layers>
+      <Layer>
+        <LayName>fiveBBS</LayName>
+        <LayPrjMark>1</LayPrjMark>
+      </Layer>
+    </Layers>
+  </LayerInfo>
 
 </Project>

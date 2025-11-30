@@ -22,104 +22,40 @@
  * 
  *****************************************************************************/
  
-#ifndef __I2C_PORT_H__  /* Avoid repeated inclusion */
-#define __I2C_PORT_H__
+#ifndef __i2c_device_H__  /* Avoid repeated inclusion */
+#define __i2c_device_H__
 
-
+//typedef struct GPIO_TypeDef GPIO_device_TypeDef;
 //******************************** Includes *********************************//
-#include "main.h"
-#include "i2c.h"   // hardware i2c
-#include "iic_hal.h" // software i2c
+#include "Protocol_driver_Port.h"
+
 #include "os_freertos.h"
 #include "osal_mutex.h"
 //******************************** Includes *********************************//
 //******************************** Typedefs *********************************//
-typedef enum
-{
-    EN_HARDWARE_I2C = 0,
-    EN_SOFTWARE_I2C
-}en_i2c_state_t;
-
-typedef enum
-{
-    CORE_I2C_OK = 0,
-    CORE_I2C_ERROR
-}en_core_i2c_status_t;
-
-typedef enum
-{
-    CORE_I2C_BUS_1 = 0,
-    CORE_I2C_BUS_2,
-    CORE_I2C_BUS_MAX
-}en_core_i2c_bus_t;
+typedef struct I2C_HandleTypeDef I2C_device_HandleTypeDef;
 
 
-typedef struct
-{
-    en_i2c_state_t en_i2c_state;
-    iic_bus_t st_iic_bus_inst;                          //软件i2c接口
-    I2C_HandleTypeDef* st_I2C_HandleTypeDef;             //硬件i2c接口
-    osal_mutex_handle_t st_osMutexId;                   //互斥锁接口
-} st_i2c_port_t;
+// I2C配置结构体（抽象版，仅保留核心参数）
+typedef struct {
+    I2C_device_HandleTypeDef* i2c_handle;  // I2C硬件句柄（指针类型，支持前置声明）
+    uint8_t  device_addr;           // 设备I2C地址（7/10位）
+    uint32_t timeout_ms;            // 通信超时时间（ms）
+} I2CConfig;
 
+// I2C设备结构体（继承BaseDevice，解耦HAL库）
+typedef struct {
+    BaseDevice base;                // 基类（必须放第一个成员，保证类型转换兼容）
+    I2C_device_HandleTypeDef* i2c_handle;  // I2C硬件句柄
+    uint8_t  device_addr;           // 设备地址
+    uint32_t timeout_ms;            // 超时时间
+} I2CDevice;
+
+BaseDevice* i2c_device_create(I2CConfig* config);
 //******************************** Typedefs *********************************//
 
 //******************************** Defines **********************************//
-#define SENSOR_I2C_REGISTER_MUTEX(mutex)        \
-        core_i2c_register_mutex(CORE_I2C_BUS_1,mutex)
 
-#define SENSOR_I2C_HARDWARE_WRITE(dev_addr,data,size,timeout)        \
-        core_i2c_write(CORE_I2C_BUS_1, dev_addr, data, size, timeout)
-
-#define SENSOR_I2C_HARDWARE_READ(dev_addr,data,size,timeout)        \
-        core_i2c_read(CORE_I2C_BUS_1, dev_addr, data, size, timeout)
-
-#define SENSOR_I2C_HARDWARE_MEM_WRITE(dev_addr, mem_addr, em_size, data, size, timeout) \
-        core_i2c_mem_write(CORE_I2C_BUS_1, dev_addr, mem_addr, em_size, data, size, timeout)
-
-#define SENSOR_I2C_HARDWARE_MEM_READ(dev_addr, mem_addr, em_size, data, size, timeout) \
-        core_i2c_mem_read(CORE_I2C_BUS_1,  dev_addr, mem_addr, em_size, data, size, timeout)
-
-#define SENSOR_I2C_HARDWARE_MEM_READ_DMA(dev_addr, mem_addr, em_size, data, size, timeout) \
-        core_i2c_mem_read_dma(CORE_I2C_BUS_1,  dev_addr, mem_addr, em_size, data, size)
-
-#define SENSOR_I2C_SOFTWARE_START()  \
-        core_i2c_soft_start(CORE_I2C_BUS_1)
-
-
-#define SENSOR_I2C_SOFTWARE_STOP()  \
-        core_i2c_soft_stop(CORE_I2C_BUS_1)
-
-
-#define SENSOR_I2C_SOFTWARE_WAITACK()  \
-        core_i2c_soft_wait_ack(CORE_I2C_BUS_1)
-
-#define SENSOR_I2C_SOFTWARE_SENDACK()  \
-        core_i2c_soft_send_ack(CORE_I2C_BUS_1)
-
-#define SENSOR_I2C_SOFTWARE_SENDNOACK()  \
-        core_i2c_soft_send_no_ack(CORE_I2C_BUS_1)
-
-#define SENSOR_I2C_SOFTWARE_SENDBYTE(data)  \
-        core_i2c_soft_send_byte(CORE_I2C_BUS_1,data)
-
-#define SENSOR_I2C_SOFTWARE_RECEIVEBYTE(data)  \
-        core_i2c_soft_receive_byte(CORE_I2C_BUS_1,data)
-
-#define TOUCHPAD_I2C_HARDWARE_WRITE(dev_addr,data,size,timeout)        \
-        core_i2c_write(CORE_I2C_BUS_2, dev_addr, data, size, timeout)
-
-#define TOUCHPAD_I2C_HARDWARE_READ(dev_addr,data,size,timeout)        \
-        core_i2c_read(CORE_I2C_BUS_2, dev_addr, data, size, timeout)
-
-#define TOUCHPAD_I2C_HARDWARE_MEM_WRITE(dev_addr, mem_addr, em_size, data, size, timeout) \
-        core_i2c_mem_write(CORE_I2C_BUS_2, dev_addr, mem_addr, em_size, data, size, timeout)
-
-#define TOUCHPAD_I2C_HARDWARE_MEM_READ(dev_addr, mem_addr, em_size, data, size, timeout) \
-        core_i2c_mem_read(CORE_I2C_BUS_2,  dev_addr, mem_addr, em_size, data, size, timeout)
-
-#define TOUCHPAD_I2C_HARDWARE_MEM_READ_DMA(dev_addr, mem_addr, em_size, data, size) \
-        core_i2c_mem_read_dma(CORE_I2C_BUS_2,  dev_addr, mem_addr, em_size, data, size)
 //******************************** Defines **********************************//
 
 //**************************** Interface Structs ****************************//
@@ -131,7 +67,7 @@ typedef struct
 //******************************** Classes **********************************//
 
 //******************************** APIs *************************************//
-void core_i2c_register_mutex(en_core_i2c_bus_t bus, osal_mutex_handle_t mutex);
+
 //******************************** APIs *************************************//
 
 

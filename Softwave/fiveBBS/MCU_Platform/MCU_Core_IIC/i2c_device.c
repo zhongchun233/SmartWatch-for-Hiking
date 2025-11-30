@@ -25,11 +25,13 @@
  * 
  *****************************************************************************/
 //******************************** Includes *********************************//
-#include "i2c_port.h"
+#include "Protocol_driver_Port.h"
+#include "soft_i2c_device.h"   // hardware i2c
 #include "i2c.h"   // hardware i2c
-#include "iic_hal.h" // software i2c
-#include "os_freertos.h"
+
 #include "osal_mutex.h"
+#include "osal_internal_mutex.h"
+#include "osal_heap.h"
 #include "cmsis_os2.h"
 //******************************** Includes *********************************//
 
@@ -38,313 +40,152 @@
 //******************************** Defines **********************************//
 
 //******************************** Variables ********************************//
-
-static st_i2c_port_t st_i2c_port[CORE_I2C_BUS_MAX] =
-{
-    [CORE_I2C_BUS_1] = {
-        .en_i2c_state = EN_HARDWARE_I2C,
-        .st_iic_bus_inst = {
-            .IIC_SDA_PORT = Sensor_SDA_GPIO_Port,
-            .IIC_SDA_PIN = Sensor_SDA_Pin,
-            .IIC_SCL_PORT = Sensor_SCL_GPIO_Port,
-            .IIC_SCL_PIN = Sensor_SCL_Pin
-        },
-        .st_I2C_HandleTypeDef = &hi2c1,
-    },
-    [CORE_I2C_BUS_2] ={
-        .en_i2c_state = EN_HARDWARE_I2C,
-        .st_I2C_HandleTypeDef = &hi2c3
+static int i2c_device_init(BaseDevice* self, void* config) {
+    I2CDevice* i2c_dev = (I2CDevice*)self;
+    I2CConfig* cfg = (I2CConfig*)config;
+    
+    if (!i2c_dev || !cfg) {
+        return -1;
     }
-};
-//******************************** Variables ********************************//
+    
+    i2c_dev->i2c_handle = cfg->i2c_handle;
+    i2c_dev->device_addr = cfg->device_addr;
+    i2c_dev->timeout_ms = cfg->timeout_ms;
+    
+    self->state = DEVICE_STATE_READY;
+    return 0;
+}
 
-//******************************** Functions ********************************//
-static void core_i2c_switch(en_core_i2c_bus_t bus, en_i2c_state_t state);
-
-
-/**
- * @brief core_i2c_register_mutex
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-void core_i2c_register_mutex(en_core_i2c_bus_t bus, osal_mutex_handle_t mutex)
-{
-    if (bus < CORE_I2C_BUS_MAX) {
-        st_i2c_port[bus].st_osMutexId = mutex;
+static int i2c_device_deinit(BaseDevice* self) {
+    if (!self) {
+        return -1;
     }
+    
+    self->state = DEVICE_STATE_UNINIT;
+    return 0;
 }
 
-/**
- * @brief core_i2c_lock
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-static inline void core_i2c_lock(en_core_i2c_bus_t bus)
-{
-    if (st_i2c_port[bus].st_osMutexId) {
-        osal_mutex_take(st_i2c_port[bus].st_osMutexId, osWaitForever);
+static int i2c_device_read(BaseDevice* self, uint8_t* buffer, size_t length) {
+    I2CDevice* i2c_dev = (I2CDevice*)self;
+    HAL_StatusTypeDef status;
+    
+    if (!i2c_dev || !buffer || length == 0) {
+        return -1;
     }
-}
-
-/**
- * @brief core_i2c_unlock
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-static inline void core_i2c_unlock(en_core_i2c_bus_t bus)
-{
-    if (st_i2c_port[bus].st_osMutexId) {
-        osal_mutex_give(st_i2c_port[bus].st_osMutexId);
+    
+    if (self->state != DEVICE_STATE_READY) {
+        return -2;
     }
+    
+    self->state = DEVICE_STATE_BUSY;
+    
+    // I2C读取
+    status = HAL_I2C_Master_Receive((I2C_HandleTypeDef*)i2c_dev->i2c_handle,
+                                    i2c_dev->device_addr << 1,
+                                    buffer, length,
+                                    i2c_dev->timeout_ms);
+    
+    self->state = DEVICE_STATE_READY;
+    
+    if (status != HAL_OK) {
+        self->state = DEVICE_STATE_ERROR;
+        self->error_code = status;
+        return -3;
+    }
+    
+    return length;
+}
+static int i2c_device_write(BaseDevice* self, const uint8_t* data, size_t length) {
+    I2CDevice* i2c_dev = (I2CDevice*)self;
+    HAL_StatusTypeDef status;
+    
+    if (!i2c_dev || !data || length == 0) {
+        return -1;
+    }
+    
+    if (self->state != DEVICE_STATE_READY) {
+        return -2;
+    }
+    
+    self->state = DEVICE_STATE_BUSY;
+    
+    // I2C写入
+    status = HAL_I2C_Master_Transmit((I2C_HandleTypeDef*)i2c_dev->i2c_handle,
+                                     i2c_dev->device_addr << 1,
+                                     (uint8_t*)data, length,
+                                     i2c_dev->timeout_ms);
+    
+    self->state = DEVICE_STATE_READY;
+    
+    if (status != HAL_OK) {
+        self->state = DEVICE_STATE_ERROR;
+        self->error_code = status;
+        return -3;
+    }
+    
+    return length;
+}
+static int i2c_device_ioctl(BaseDevice* self, IOCTL_CMD cmd, void* arg) {
+    I2CDevice* i2c_dev = (I2CDevice*)self;
+    
+    switch (cmd) {
+        case I2C_IOCTL_SET_ADDR:
+            if (arg) {
+                i2c_dev->device_addr = *(uint8_t*)arg;
+                return 0;
+            }
+            break;
+        case I2C_IOCTL_GET_ADDR:
+            if (arg) {
+                *(uint8_t*)arg = i2c_dev->device_addr;
+                return 0;
+            }
+            break;
+        default:
+					log_e("cmd input ERROR");
+            return -1;
+    }
+    return -1;
 }
 
-/**
- * @brief core_i2c_write
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_write(en_core_i2c_bus_t bus, uint16_t dev_addr, uint8_t *data, uint16_t size, uint32_t timeout)
-{
-    if (bus >= CORE_I2C_BUS_MAX || ((I2C_HandleTypeDef *)&st_i2c_port[bus].st_I2C_HandleTypeDef == NULL)) return CORE_I2C_ERROR;
-    core_i2c_lock(bus);
-    core_i2c_switch(bus,EN_HARDWARE_I2C);
-    HAL_StatusTypeDef ret = HAL_I2C_Master_Transmit(st_i2c_port[bus].st_I2C_HandleTypeDef, dev_addr, data, size, timeout);
-    core_i2c_unlock(bus);
-    return (ret == HAL_OK) ? CORE_I2C_OK : CORE_I2C_ERROR;
-}
-
-/**
- * @brief core_i2c_read
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_read(en_core_i2c_bus_t bus, uint16_t dev_addr, uint8_t *data, uint16_t size, uint32_t timeout)
-{
-    if (bus >= CORE_I2C_BUS_MAX || ((I2C_HandleTypeDef *)&st_i2c_port[bus].st_I2C_HandleTypeDef == NULL)) return CORE_I2C_ERROR;
-    core_i2c_lock(bus);
-    core_i2c_switch(bus,EN_HARDWARE_I2C);
-    HAL_StatusTypeDef ret = HAL_I2C_Master_Receive(st_i2c_port[bus].st_I2C_HandleTypeDef, dev_addr, data, size, timeout);
-    core_i2c_unlock(bus);
-    return (ret == HAL_OK) ? CORE_I2C_OK : CORE_I2C_ERROR;
-}
-
-/**
- * @brief core_i2c_mem_write
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_mem_write(en_core_i2c_bus_t bus, uint16_t dev_addr, uint16_t mem_addr, uint16_t mem_size,
-                                     uint8_t *data, uint16_t size, uint32_t timeout)
-{
-    if (bus >= CORE_I2C_BUS_MAX || ((I2C_HandleTypeDef *)&st_i2c_port[bus].st_I2C_HandleTypeDef == NULL)) return CORE_I2C_ERROR;
-    core_i2c_lock(bus);
-    core_i2c_switch(bus,EN_HARDWARE_I2C);
-    HAL_StatusTypeDef ret = HAL_I2C_Mem_Write(st_i2c_port[bus].st_I2C_HandleTypeDef, dev_addr, mem_addr, mem_size, data, size, timeout);
-    core_i2c_unlock(bus);
-    return (ret == HAL_OK) ? CORE_I2C_OK : CORE_I2C_ERROR;
-}
-/**
- * @brief core_i2c_mem_read
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_mem_read(en_core_i2c_bus_t bus, uint16_t dev_addr, uint16_t mem_addr, uint16_t mem_size,
-                                    uint8_t *data, uint16_t size, uint32_t timeout)
-{
-    if (bus >= CORE_I2C_BUS_MAX || ((I2C_HandleTypeDef *)&st_i2c_port[bus].st_I2C_HandleTypeDef == NULL)) return CORE_I2C_ERROR;
-    core_i2c_lock(bus);
-    core_i2c_switch(bus,EN_HARDWARE_I2C);
-    HAL_StatusTypeDef ret = HAL_I2C_Mem_Read(st_i2c_port[bus].st_I2C_HandleTypeDef, dev_addr, mem_addr, mem_size, data, size, timeout);
-    core_i2c_unlock(bus);
-    return (ret == HAL_OK) ? CORE_I2C_OK : CORE_I2C_ERROR;
-}
-
-/**
- * @brief core_i2c_mem_read_dma
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_mem_read_dma(en_core_i2c_bus_t bus, uint16_t dev_addr, uint16_t mem_addr, uint16_t mem_size,
-                                            uint8_t *data, uint16_t size)
-{
-    if (bus >= CORE_I2C_BUS_MAX || ((I2C_HandleTypeDef *)&st_i2c_port[bus].st_I2C_HandleTypeDef == NULL)) return CORE_I2C_ERROR;
-    //core_i2c_lock(bus);
-    core_i2c_switch(bus,EN_HARDWARE_I2C);
-    HAL_StatusTypeDef ret = \
-    HAL_I2C_Mem_Read_DMA(st_i2c_port[bus].st_I2C_HandleTypeDef, \
-                        dev_addr, mem_addr, mem_size, data, size);
-    //core_i2c_unlock(bus);
-    return (ret == HAL_OK) ? CORE_I2C_OK : CORE_I2C_ERROR;
-}
-/**
- * @brief core_i2c_soft_start
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_soft_start(en_core_i2c_bus_t bus)
-{
-    if (bus >= CORE_I2C_BUS_MAX || st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PORT == NULL) return CORE_I2C_ERROR;
-    core_i2c_lock(bus);
-    core_i2c_switch(bus,EN_SOFTWARE_I2C);
-    IICStart(&st_i2c_port[bus].st_iic_bus_inst);
-    //core_i2c_unlock(bus);
-    return CORE_I2C_OK;
-}
-
-/**
- * @brief core_i2c_soft_stop
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_soft_stop(en_core_i2c_bus_t bus)
-{
-    if (bus >= CORE_I2C_BUS_MAX || st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PORT == NULL) return CORE_I2C_ERROR;
-    IICStop(&st_i2c_port[bus].st_iic_bus_inst);
-    core_i2c_unlock(bus);
-    return CORE_I2C_OK;
-}
-
-/**
- * @brief core_i2c_soft_wait_ack
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_soft_wait_ack(en_core_i2c_bus_t bus)
-{
-    if (bus >= CORE_I2C_BUS_MAX || st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PORT == NULL) return CORE_I2C_ERROR;
-    unsigned char ret = SUCCESS; // should be ErrorStatus but IICWaitAck(X)
-    ret = IICWaitAck(&st_i2c_port[bus].st_iic_bus_inst);
-    if(SUCCESS == ret)
-    {
-        return CORE_I2C_OK;
-    } else {
-        return CORE_I2C_ERROR;
+static void i2c_device_destroy(BaseDevice* self) {
+    if (self) {
+        i2c_device_deinit(self);
+        osal_heap_free(self);
     }
 }
 
-/**
- * @brief core_i2c_soft_send_ack
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_soft_send_ack(en_core_i2c_bus_t bus)
-{
-    if (bus >= CORE_I2C_BUS_MAX || st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PORT == NULL) return CORE_I2C_ERROR;
-    IICSendAck(&st_i2c_port[bus].st_iic_bus_inst);
-    return CORE_I2C_OK;
-}
-
-/**
- * @brief core_i2c_soft_send_no_ack
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_soft_send_no_ack(en_core_i2c_bus_t bus)
-{
-    if (bus >= CORE_I2C_BUS_MAX || st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PORT == NULL) return CORE_I2C_ERROR;
-    IICSendNotAck(&st_i2c_port[bus].st_iic_bus_inst);
-    return CORE_I2C_OK;
-}
-
-/**
- * @brief core_i2c_soft_send_byte
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_soft_send_byte(en_core_i2c_bus_t bus,uint8_t data)
-{
-    if (bus >= CORE_I2C_BUS_MAX || st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PORT == NULL) return CORE_I2C_ERROR;
-    IICSendByte(&st_i2c_port[bus].st_iic_bus_inst, data);
-    return CORE_I2C_OK;
-}
-
-/**
- * @brief core_i2c_soft_receive_byte
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_soft_receive_byte(en_core_i2c_bus_t bus,uint8_t * const data)
-{
-    if (bus >= CORE_I2C_BUS_MAX || st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PORT == NULL) return CORE_I2C_ERROR;
-    *data = IICReceiveByte(&st_i2c_port[bus].st_iic_bus_inst);
-    return CORE_I2C_OK;
-}
-/**
- * @brief I2C_software_Init
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-static en_core_i2c_status_t core_i2c_software_init(en_core_i2c_bus_t bus)
-{
-    if (bus >= CORE_I2C_BUS_MAX || st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PORT == NULL) return CORE_I2C_ERROR;
-    GPIO_InitTypeDef GPIO_InitStructure = {0};
-
-	__HAL_RCC_GPIOB_CLK_ENABLE();
-
-    GPIO_InitStructure.Pin = st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PIN;
-    GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStructure.Pull = GPIO_NOPULL;
-    GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
-    HAL_GPIO_Init(st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PORT, &GPIO_InitStructure);
-
-	GPIO_InitStructure.Pin = st_i2c_port[bus].st_iic_bus_inst.IIC_SCL_PIN ;
-    HAL_GPIO_Init(st_i2c_port[bus].st_iic_bus_inst.IIC_SCL_PORT, &GPIO_InitStructure);
-}
-
-/**
- * @brief user_com_switch
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-static void core_i2c_switch(en_core_i2c_bus_t bus, en_i2c_state_t state)
-{
-	if (bus >= CORE_I2C_BUS_MAX || st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PORT == NULL) return;
-	if(st_i2c_port[bus].en_i2c_state == state)
-  {
-    //相等，不切换
-  }
-  else
-  {
-    if(EN_HARDWARE_I2C == state)
-    {
-        __HAL_RCC_I2C1_CLK_DISABLE();
-        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_6);
-        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_7);
-        //切换硬件I2C
-        MX_I2C1_Init();
-		st_i2c_port[bus].en_i2c_state = EN_HARDWARE_I2C;
+BaseDevice* i2c_device_create(I2CConfig* config) {
+    I2CDevice* i2c_dev = (I2CDevice*)osal_heap_malloc(sizeof(I2CDevice));
+    
+    if (!i2c_dev) {
+			log_e("I2C_device_create: create I2C_dev failed ");
+        return NULL;
     }
-    else
-    {
-      /*切换软件I2C
-      需要先把硬件I2C停掉
-      停用I2C外设*/
-      HAL_I2C_DeInit(st_i2c_port[bus].st_I2C_HandleTypeDef);
-      // 禁用I2C时钟
-      __HAL_RCC_I2C1_CLK_DISABLE();
-
-      core_i2c_software_init(bus);
-		
-	  st_i2c_port[bus].en_i2c_state = EN_SOFTWARE_I2C;
+    
+    memset(i2c_dev, 0, sizeof(I2CDevice));
+    i2c_dev->base.type = DEVICE_TYPE_I2C;
+    i2c_dev->base.state = DEVICE_STATE_UNINIT;
+    
+    // 绑定虚函数
+    i2c_dev->base.init = i2c_device_init;
+    i2c_dev->base.deinit = i2c_device_deinit;
+    i2c_dev->base.read = i2c_device_read;
+    i2c_dev->base.write = i2c_device_write;
+    i2c_dev->base.ioctl = i2c_device_ioctl;
+    i2c_dev->base.destroy = i2c_device_destroy;
+		int32_t ret = osal_mutex_create(&i2c_dev->base.Device_mutex);
+		if (ret != OSAL_SUCCESS) {
+        log_e("I2C_device_create: create mutex failed ");
+        osal_heap_free(i2c_dev);  // 回滚内存，避免泄漏
+        return NULL;
     }
-  }
+    
+    if (config) {
+        i2c_dev->i2c_handle = config->i2c_handle;
+        i2c_dev->device_addr = config->device_addr;
+        i2c_dev->timeout_ms = config->timeout_ms;
+    }
+    
+    return (BaseDevice*)i2c_dev;
 }
-
-

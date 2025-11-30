@@ -11,7 +11,7 @@
  * - iic_hal.h
  * - os_freertos
  * - osal_mutex
- * @author Simon | R&D Dept. | EternalChip 立芯嵌入式
+ * @author chengfeng26
  * 
  * @brief Provide the HAL APIs of AHT21 and corresponding opetions.
  * 
@@ -19,332 +19,338 @@
  * 
  * 2.Then the users could all the IOs from instances of bsp_aht21_driver_t.
  * 
- * @version V1.0 2023-12-03
+ * @version V1.0 2025-12-03
  *
  * @note 1 tab == 4 spaces!
  * 
  *****************************************************************************/
-//******************************** Includes *********************************//
-#include "i2c_port.h"
-#include "i2c.h"   // hardware i2c
-#include "iic_hal.h" // software i2c
-#include "os_freertos.h"
-#include "osal_mutex.h"
-#include "cmsis_os2.h"
-//******************************** Includes *********************************//
-
-//******************************** Defines **********************************//
-
-//******************************** Defines **********************************//
-
-//******************************** Variables ********************************//
-
-static st_i2c_port_t st_i2c_port[CORE_I2C_BUS_MAX] =
-{
-    [CORE_I2C_BUS_1] = {
-        .en_i2c_state = EN_HARDWARE_I2C,
-        .st_iic_bus_inst = {
-            .IIC_SDA_PORT = Sensor_SDA_GPIO_Port,
-            .IIC_SDA_PIN = Sensor_SDA_Pin,
-            .IIC_SCL_PORT = Sensor_SCL_GPIO_Port,
-            .IIC_SCL_PIN = Sensor_SCL_Pin
-        },
-        .st_I2C_HandleTypeDef = &hi2c1,
-    },
-    [CORE_I2C_BUS_2] ={
-        .en_i2c_state = EN_HARDWARE_I2C,
-        .st_I2C_HandleTypeDef = &hi2c3
-    }
-};
-//******************************** Variables ********************************//
-
-//******************************** Functions ********************************//
-static void core_i2c_switch(en_core_i2c_bus_t bus, en_i2c_state_t state);
+#include "Protocol_driver_Port.h"
 
 
+#include "stm32f1xx_hal.h"
 /**
- * @brief core_i2c_register_mutex
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-void core_i2c_register_mutex(en_core_i2c_bus_t bus, osal_mutex_handle_t mutex)
+  * @brief SDA线输入模式配置
+  * @param None
+  * @retval None
+  */
+void SDA_Input_Mode(iic_bus_t *bus)
 {
-    if (bus < CORE_I2C_BUS_MAX) {
-        st_i2c_port[bus].st_osMutexId = mutex;
-    }
+    GPIO_device_InitTypeDef GPIO_InitStructure_t = {0};
+
+    GPIO_InitStructure_t.Pin = bus->IIC_SDA_PIN;
+    GPIO_InitStructure_t.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStructure_t.Pull = GPIO_PULLUP;
+    GPIO_InitStructure_t.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_device_Init(bus->IIC_SDA_PORT, &GPIO_InitStructure_t);
 }
 
 /**
- * @brief core_i2c_lock
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-static inline void core_i2c_lock(en_core_i2c_bus_t bus)
+  * @brief SDA线输出模式配置
+  * @param None
+  * @retval None
+  */
+void SDA_Output_Mode(iic_bus_t *bus)
 {
-    if (st_i2c_port[bus].st_osMutexId) {
-        osal_mutex_take(st_i2c_port[bus].st_osMutexId, osWaitForever);
-    }
+    GPIO_device_InitTypeDef GPIO_InitStructure_t = {0};
+
+    GPIO_InitStructure_t.Pin = bus->IIC_SDA_PIN;
+    GPIO_InitStructure_t.Mode = GPIO_MODE_OUTPUT_OD;
+    GPIO_InitStructure_t.Pull = GPIO_NOPULL;
+    GPIO_InitStructure_t.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_device_Init(bus->IIC_SDA_PORT, &GPIO_InitStructure_t);
 }
 
 /**
- * @brief core_i2c_unlock
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-static inline void core_i2c_unlock(en_core_i2c_bus_t bus)
+  * @brief SDA线输出一个位
+  * @param val 输出的数据
+  * @retval None
+  */
+void SDA_Output(iic_bus_t *bus, uint16_t val)
 {
-    if (st_i2c_port[bus].st_osMutexId) {
-        osal_mutex_give(st_i2c_port[bus].st_osMutexId);
-    }
-}
-
-/**
- * @brief core_i2c_write
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_write(en_core_i2c_bus_t bus, uint16_t dev_addr, uint8_t *data, uint16_t size, uint32_t timeout)
-{
-    if (bus >= CORE_I2C_BUS_MAX || ((I2C_HandleTypeDef *)&st_i2c_port[bus].st_I2C_HandleTypeDef == NULL)) return CORE_I2C_ERROR;
-    core_i2c_lock(bus);
-    core_i2c_switch(bus,EN_HARDWARE_I2C);
-    HAL_StatusTypeDef ret = HAL_I2C_Master_Transmit(st_i2c_port[bus].st_I2C_HandleTypeDef, dev_addr, data, size, timeout);
-    core_i2c_unlock(bus);
-    return (ret == HAL_OK) ? CORE_I2C_OK : CORE_I2C_ERROR;
-}
-
-/**
- * @brief core_i2c_read
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_read(en_core_i2c_bus_t bus, uint16_t dev_addr, uint8_t *data, uint16_t size, uint32_t timeout)
-{
-    if (bus >= CORE_I2C_BUS_MAX || ((I2C_HandleTypeDef *)&st_i2c_port[bus].st_I2C_HandleTypeDef == NULL)) return CORE_I2C_ERROR;
-    core_i2c_lock(bus);
-    core_i2c_switch(bus,EN_HARDWARE_I2C);
-    HAL_StatusTypeDef ret = HAL_I2C_Master_Receive(st_i2c_port[bus].st_I2C_HandleTypeDef, dev_addr, data, size, timeout);
-    core_i2c_unlock(bus);
-    return (ret == HAL_OK) ? CORE_I2C_OK : CORE_I2C_ERROR;
-}
-
-/**
- * @brief core_i2c_mem_write
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_mem_write(en_core_i2c_bus_t bus, uint16_t dev_addr, uint16_t mem_addr, uint16_t mem_size,
-                                     uint8_t *data, uint16_t size, uint32_t timeout)
-{
-    if (bus >= CORE_I2C_BUS_MAX || ((I2C_HandleTypeDef *)&st_i2c_port[bus].st_I2C_HandleTypeDef == NULL)) return CORE_I2C_ERROR;
-    core_i2c_lock(bus);
-    core_i2c_switch(bus,EN_HARDWARE_I2C);
-    HAL_StatusTypeDef ret = HAL_I2C_Mem_Write(st_i2c_port[bus].st_I2C_HandleTypeDef, dev_addr, mem_addr, mem_size, data, size, timeout);
-    core_i2c_unlock(bus);
-    return (ret == HAL_OK) ? CORE_I2C_OK : CORE_I2C_ERROR;
-}
-/**
- * @brief core_i2c_mem_read
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_mem_read(en_core_i2c_bus_t bus, uint16_t dev_addr, uint16_t mem_addr, uint16_t mem_size,
-                                    uint8_t *data, uint16_t size, uint32_t timeout)
-{
-    if (bus >= CORE_I2C_BUS_MAX || ((I2C_HandleTypeDef *)&st_i2c_port[bus].st_I2C_HandleTypeDef == NULL)) return CORE_I2C_ERROR;
-    core_i2c_lock(bus);
-    core_i2c_switch(bus,EN_HARDWARE_I2C);
-    HAL_StatusTypeDef ret = HAL_I2C_Mem_Read(st_i2c_port[bus].st_I2C_HandleTypeDef, dev_addr, mem_addr, mem_size, data, size, timeout);
-    core_i2c_unlock(bus);
-    return (ret == HAL_OK) ? CORE_I2C_OK : CORE_I2C_ERROR;
-}
-
-/**
- * @brief core_i2c_mem_read_dma
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_mem_read_dma(en_core_i2c_bus_t bus, uint16_t dev_addr, uint16_t mem_addr, uint16_t mem_size,
-                                            uint8_t *data, uint16_t size)
-{
-    if (bus >= CORE_I2C_BUS_MAX || ((I2C_HandleTypeDef *)&st_i2c_port[bus].st_I2C_HandleTypeDef == NULL)) return CORE_I2C_ERROR;
-    //core_i2c_lock(bus);
-    core_i2c_switch(bus,EN_HARDWARE_I2C);
-    HAL_StatusTypeDef ret = \
-    HAL_I2C_Mem_Read_DMA(st_i2c_port[bus].st_I2C_HandleTypeDef, \
-                        dev_addr, mem_addr, mem_size, data, size);
-    //core_i2c_unlock(bus);
-    return (ret == HAL_OK) ? CORE_I2C_OK : CORE_I2C_ERROR;
-}
-/**
- * @brief core_i2c_soft_start
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_soft_start(en_core_i2c_bus_t bus)
-{
-    if (bus >= CORE_I2C_BUS_MAX || st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PORT == NULL) return CORE_I2C_ERROR;
-    core_i2c_lock(bus);
-    core_i2c_switch(bus,EN_SOFTWARE_I2C);
-    IICStart(&st_i2c_port[bus].st_iic_bus_inst);
-    //core_i2c_unlock(bus);
-    return CORE_I2C_OK;
-}
-
-/**
- * @brief core_i2c_soft_stop
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_soft_stop(en_core_i2c_bus_t bus)
-{
-    if (bus >= CORE_I2C_BUS_MAX || st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PORT == NULL) return CORE_I2C_ERROR;
-    IICStop(&st_i2c_port[bus].st_iic_bus_inst);
-    core_i2c_unlock(bus);
-    return CORE_I2C_OK;
-}
-
-/**
- * @brief core_i2c_soft_wait_ack
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_soft_wait_ack(en_core_i2c_bus_t bus)
-{
-    if (bus >= CORE_I2C_BUS_MAX || st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PORT == NULL) return CORE_I2C_ERROR;
-    unsigned char ret = SUCCESS; // should be ErrorStatus but IICWaitAck(X)
-    ret = IICWaitAck(&st_i2c_port[bus].st_iic_bus_inst);
-    if(SUCCESS == ret)
+    if ( val )
     {
-        return CORE_I2C_OK;
-    } else {
-        return CORE_I2C_ERROR;
-    }
-}
-
-/**
- * @brief core_i2c_soft_send_ack
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_soft_send_ack(en_core_i2c_bus_t bus)
-{
-    if (bus >= CORE_I2C_BUS_MAX || st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PORT == NULL) return CORE_I2C_ERROR;
-    IICSendAck(&st_i2c_port[bus].st_iic_bus_inst);
-    return CORE_I2C_OK;
-}
-
-/**
- * @brief core_i2c_soft_send_no_ack
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_soft_send_no_ack(en_core_i2c_bus_t bus)
-{
-    if (bus >= CORE_I2C_BUS_MAX || st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PORT == NULL) return CORE_I2C_ERROR;
-    IICSendNotAck(&st_i2c_port[bus].st_iic_bus_inst);
-    return CORE_I2C_OK;
-}
-
-/**
- * @brief core_i2c_soft_send_byte
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_soft_send_byte(en_core_i2c_bus_t bus,uint8_t data)
-{
-    if (bus >= CORE_I2C_BUS_MAX || st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PORT == NULL) return CORE_I2C_ERROR;
-    IICSendByte(&st_i2c_port[bus].st_iic_bus_inst, data);
-    return CORE_I2C_OK;
-}
-
-/**
- * @brief core_i2c_soft_receive_byte
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-en_core_i2c_status_t core_i2c_soft_receive_byte(en_core_i2c_bus_t bus,uint8_t * const data)
-{
-    if (bus >= CORE_I2C_BUS_MAX || st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PORT == NULL) return CORE_I2C_ERROR;
-    *data = IICReceiveByte(&st_i2c_port[bus].st_iic_bus_inst);
-    return CORE_I2C_OK;
-}
-/**
- * @brief I2C_software_Init
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-static en_core_i2c_status_t core_i2c_software_init(en_core_i2c_bus_t bus)
-{
-    if (bus >= CORE_I2C_BUS_MAX || st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PORT == NULL) return CORE_I2C_ERROR;
-    GPIO_InitTypeDef GPIO_InitStructure = {0};
-
-	__HAL_RCC_GPIOB_CLK_ENABLE();
-
-    GPIO_InitStructure.Pin = st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PIN;
-    GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStructure.Pull = GPIO_NOPULL;
-    GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
-    HAL_GPIO_Init(st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PORT, &GPIO_InitStructure);
-
-	GPIO_InitStructure.Pin = st_i2c_port[bus].st_iic_bus_inst.IIC_SCL_PIN ;
-    HAL_GPIO_Init(st_i2c_port[bus].st_iic_bus_inst.IIC_SCL_PORT, &GPIO_InitStructure);
-}
-
-/**
- * @brief user_com_switch
- * @param[in] :None
- * @param[Out] :None
- * @return None
- * */
-static void core_i2c_switch(en_core_i2c_bus_t bus, en_i2c_state_t state)
-{
-	if (bus >= CORE_I2C_BUS_MAX || st_i2c_port[bus].st_iic_bus_inst.IIC_SDA_PORT == NULL) return;
-	if(st_i2c_port[bus].en_i2c_state == state)
-  {
-    //相等，不切换
-  }
-  else
-  {
-    if(EN_HARDWARE_I2C == state)
-    {
-        __HAL_RCC_I2C1_CLK_DISABLE();
-        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_6);
-        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_7);
-        //切换硬件I2C
-        MX_I2C1_Init();
-		st_i2c_port[bus].en_i2c_state = EN_HARDWARE_I2C;
+        GPIO_device_WritePin(bus->IIC_SDA_PORT, bus->IIC_SDA_PIN, GPIO_device_PIN_SET);
     }
     else
     {
-      /*切换软件I2C
-      需要先把硬件I2C停掉
-      停用I2C外设*/
-      HAL_I2C_DeInit(st_i2c_port[bus].st_I2C_HandleTypeDef);
-      // 禁用I2C时钟
-      __HAL_RCC_I2C1_CLK_DISABLE();
-
-      core_i2c_software_init(bus);
-		
-	  st_i2c_port[bus].en_i2c_state = EN_SOFTWARE_I2C;
+        GPIO_device_WritePin(bus->IIC_SDA_PORT, bus->IIC_SDA_PIN, GPIO_device_PIN_RESET);
     }
-  }
+}
+
+/**
+  * @brief SCL线输出一个位
+  * @param val 输出的数据
+  * @retval None
+  */
+void SCL_Output(iic_bus_t *bus, uint16_t val)
+{
+    if ( val )
+    {
+        GPIO_device_WritePin(bus->IIC_SDA_PORT, bus->IIC_SDA_PIN, GPIO_device_PIN_SET);
+    }
+    else
+    {
+        GPIO_device_WritePin(bus->IIC_SDA_PORT, bus->IIC_SDA_PIN, GPIO_device_PIN_RESET);
+    }
+}
+
+/**
+  * @brief SDA输入一位
+  * @param None
+  * @retval GPIO读入一位
+  */
+uint8_t SDA_Input(iic_bus_t *bus)
+{
+	if(GPIO_device_ReadPin(bus->IIC_SDA_PORT, bus->IIC_SDA_PIN) == GPIO_PIN_SET){
+		return 1;
+	}else{
+		return 0;
+	}
+}
+
+/**
+  * @brief IIC起始信号
+  * @param None
+  * @retval None
+  */
+void IICStart(iic_bus_t *bus)
+{
+    SDA_Output(bus,1);
+    //delay1(DELAY_TIME);
+		delay_us(2);
+    SCL_Output(bus,1);
+		delay_us(1);
+    SDA_Output(bus,0);
+		delay_us(1);
+    SCL_Output(bus,0);
+		delay_us(1);
+}
+
+/**
+  * @brief IIC结束信号
+  * @param None
+  * @retval None
+  */
+void IICStop(iic_bus_t *bus)
+{
+    SCL_Output(bus,0);
+		delay_us(2);
+    SDA_Output(bus,0);
+		delay_us(1);
+    SCL_Output(bus,1);
+		delay_us(1);
+    SDA_Output(bus,1);
+		delay_us(1);
+
+}
+
+/**
+  * @brief IIC等待确认信号
+  * @param None
+  * @retval None
+  */
+unsigned char IICWaitAck(iic_bus_t *bus)
+{
+    unsigned short cErrTime = 5;
+    SDA_Input_Mode(bus);
+    SCL_Output(bus,1);
+    while(SDA_Input(bus))
+    {
+        cErrTime--;
+				delay_us(1);
+        if (0 == cErrTime)
+        {
+            SDA_Output_Mode(bus);
+            IICStop(bus);
+            return ERROR;
+        }
+    }
+    SDA_Output_Mode(bus);
+    SCL_Output(bus,0);
+		delay_us(2);
+    return SUCCESS;
+}
+
+/**
+  * @brief IIC发送确认信号
+  * @param None
+  * @retval None
+  */
+void IICSendAck(iic_bus_t *bus)
+{
+    SDA_Output(bus,0);
+		delay_us(1);
+    SCL_Output(bus,1);
+		delay_us(1);
+    SCL_Output(bus,0);
+		delay_us(1);
+}
+
+/**
+  * @brief IIC发送非确认信号
+  * @param None
+  * @retval None
+  */
+void IICSendNotAck(iic_bus_t *bus)
+{
+    SDA_Output(bus,1);
+		delay_us(1);
+    SCL_Output(bus,1);
+		delay_us(1);
+    SCL_Output(bus,0);
+		delay_us(2);
+
+}
+
+/**
+  * @brief IIC发送一个字节
+  * @param cSendByte 需要发送的字节
+  * @retval None
+  */
+void IICSendByte(iic_bus_t *bus,unsigned char cSendByte)
+{
+    unsigned char  i = 8;
+    while (i--)
+    {
+        SCL_Output(bus,0);
+        delay_us(2);
+        SDA_Output(bus, cSendByte & 0x80);
+				delay_us(1);
+        cSendByte += cSendByte;
+				delay_us(1);
+        SCL_Output(bus,1);
+				delay_us(1);
+    }
+    SCL_Output(bus,0);
+		delay_us(2);
+}
+
+/**
+  * @brief IIC接收一个字节
+  * @param None
+  * @retval 接收到的字节
+  */
+unsigned char IICReceiveByte(iic_bus_t *bus)
+{
+    unsigned char i = 8;
+    unsigned char cR_Byte = 0;
+    SDA_Input_Mode(bus);
+    while (i--)
+    {
+        cR_Byte += cR_Byte;
+        SCL_Output(bus,0);
+				delay_us(2);
+        SCL_Output(bus,1);
+				delay_us(1);
+        cR_Byte |=  SDA_Input(bus);
+    }
+    SCL_Output(bus,0);
+    SDA_Output_Mode(bus);
+    return cR_Byte;
+}
+
+uint8_t IIC_Write_One_Byte(iic_bus_t *bus, uint8_t daddr,uint8_t reg,uint8_t data)
+{				   	  	    																 
+  IICStart(bus);  
+	
+	IICSendByte(bus,daddr<<1);	    
+	if(IICWaitAck(bus))	//等待应答
+	{
+		IICStop(bus);		 
+		return 1;		
+	}
+	IICSendByte(bus,reg);
+	IICWaitAck(bus);	   	 										  		   
+	IICSendByte(bus,data);     						   
+	IICWaitAck(bus);  		    	   
+  IICStop(bus);
+	delay_us(1);
+	return 0;
+}
+
+uint8_t IIC_Write_Multi_Byte(iic_bus_t *bus, uint8_t daddr,uint8_t reg,uint8_t length,uint8_t buff[])
+{			
+	unsigned char i;	
+  IICStart(bus);  
+	
+	IICSendByte(bus,daddr<<1);	    
+	if(IICWaitAck(bus))
+	{
+		IICStop(bus);
+		return 1;
+	}
+	IICSendByte(bus,reg);
+	IICWaitAck(bus);	
+	for(i=0;i<length;i++)
+	{
+		IICSendByte(bus,buff[i]);     						   
+		IICWaitAck(bus); 
+	}		    	   
+  IICStop(bus);
+	delay_us(1);
+	return 0;
+} 
+
+unsigned char IIC_Read_One_Byte(iic_bus_t *bus, uint8_t daddr,uint8_t reg)
+{
+	unsigned char dat;
+	IICStart(bus);
+	IICSendByte(bus,daddr<<1);
+	IICWaitAck(bus);
+	IICSendByte(bus,reg);
+	IICWaitAck(bus);
+	
+	IICStart(bus);
+	IICSendByte(bus,(daddr<<1)+1);
+	IICWaitAck(bus);
+	dat = IICReceiveByte(bus);
+	IICSendNotAck(bus);
+	IICStop(bus);
+	return dat;
 }
 
 
+uint8_t IIC_Read_Multi_Byte(iic_bus_t *bus, uint8_t daddr, uint8_t reg, uint8_t length, uint8_t buff[])
+{
+	unsigned char i;
+	IICStart(bus);
+	IICSendByte(bus,daddr<<1);
+	if(IICWaitAck(bus))
+	{
+		IICStop(bus);		 
+		return 1;		
+	}
+	IICSendByte(bus,reg);
+	IICWaitAck(bus);
+	
+	IICStart(bus);
+	IICSendByte(bus,(daddr<<1)+1);
+	IICWaitAck(bus);
+	for(i=0;i<length;i++)
+	{
+		buff[i] = IICReceiveByte(bus);
+		if(i<length-1)
+		{IICSendAck(bus);}
+	}
+	IICSendNotAck(bus);
+	IICStop(bus);
+	return 0;
+}
+
+
+//
+void IICInit(iic_bus_t *bus)
+{
+    GPIO_device_InitTypeDef GPIO_InitStructure = {0};
+
+		//bus->CLK_ENABLE();
+    
+    GPIO_InitStructure.Pin = bus->IIC_SDA_PIN ;
+    GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStructure.Pull = GPIO_PULLUP;
+    GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_device_Init(bus->IIC_SDA_PORT, &GPIO_InitStructure);
+		
+		GPIO_InitStructure.Pin = bus->IIC_SCL_PIN ;
+    GPIO_device_Init(bus->IIC_SCL_PORT, &GPIO_InitStructure);
+}
