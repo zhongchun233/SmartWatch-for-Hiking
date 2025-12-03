@@ -39,7 +39,6 @@ typedef struct UART_HandleTypeDef UART_device_HandleTypeDef;
 // I2C配置结构体（抽象版，仅保留核心参数）
 typedef struct {
     UART_device_HandleTypeDef* UART_handle;  // UART硬件句柄（指针类型，支持前置声明）
-    uint8_t  device_addr;           // 设备UART地址（7/10位）
     uint32_t timeout_ms;            // 通信超时时间（ms）
 } UARTConfig;
 // uart_device.h

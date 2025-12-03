@@ -1,6 +1,12 @@
 #include "Protocol_driver_Port.h"
 #include <stdlib.h>
-#include "i2c_device.h"  
+#include "gpio_device.h"
+#include "i2c_device.h"
+#include "soft_i2c_device.h" // software i2c
+
+#include "delay.h"
+#include "spi_device.h"
+#include "uart_device.h" 
 // 统一的设备创建接口（工厂模式）
 BaseDevice* device_create(DeviceType type, void* config) {
     BaseDevice* device = NULL;
@@ -10,7 +16,7 @@ BaseDevice* device_create(DeviceType type, void* config) {
             device = spi_device_create((SPIConfig*)config);
             break;
         case DEVICE_TYPE_I2C:
-            device = i2c_device_create((I2CConfig*)config);
+//            device = i2c_device_create((I2CConfig*)config);
             break;
         case DEVICE_TYPE_UART:
 						device = uart_device_create((UARTConfig*)config);

@@ -26,7 +26,7 @@
  *****************************************************************************/
 //******************************** Includes *********************************//
 #include "Protocol_driver_Port.h"
-#include "spi.h"   // hardware i2c
+#include "gpio_device.h"
 #include "os_freertos.h"
 #include "osal_mutex.h"
 #include "cmsis_os2.h"

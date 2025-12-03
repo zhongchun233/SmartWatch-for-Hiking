@@ -24,6 +24,7 @@
 //******************************** Includes *********************************//
 #include "user_task_reso_config.h"
 #include "osal.h"
+#include "stm32f1xx_hal.h"
 //#include "bsp_temp_humi_xxx_handler.h"
 //#include "bsp_mpuxxx_handler.h"
 //#include "bsp_flash_handler.h"
@@ -58,7 +59,8 @@ st_usertaskcfg_t st_usertaskcfg[USER_TASK_NUM] =
 
 __WEAK void display_refresh_task(void *argument)
 {
-
+osal_task_delay_ms(500);
+HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
 }
 
   __WEAK void flash_handler_thread(void *argument)

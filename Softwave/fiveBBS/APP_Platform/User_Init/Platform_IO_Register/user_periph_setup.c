@@ -41,14 +41,28 @@
  */
 #include "user_periph_setup.h"
 #include "bsp_adaper_port_button.h"
+#include "Protocol_driver_Port.h"
 
+#include "gpio_device.h"
+#include "i2c_device.h"
+#include "soft_i2c_device.h" // software i2c
 
+#include "delay.h"
+#include "spi_device.h"
+#include "uart_device.h"
+#include "usart.h"
 /*
  * GLOBAL FUNCTION DEFINITIONS
  *****************************************************************************************
  */
+ UARTConfig UARTConfig_1 = {
+	.UART_handle = (UART_device_HandleTypeDef *)&huart1,
+	.timeout_ms = 100,
+ };
 void app_periph_init(void)
 {
     drv_adapter_button_register();
+	BaseDevice* DEVICE_UART_3 = device_create(DEVICE_TYPE_UART,&UARTConfig_1);
+	device_write(DEVICE_UART_3,(uint8_t *)"ok",3);
 
 }

@@ -71,12 +71,6 @@ int16_t device_ioctl(BaseDevice* device, IOCTL_CMD cmd, void* arg);
 DeviceState device_get_state(BaseDevice* device);
 DeviceType device_get_type_string(BaseDevice* device);
 
-#include "i2c_device.h"
-#include "soft_i2c_device.h" // software i2c
-#include "i2c_device.h" // software i2c
-#include "gpio_device.h"
-#include "delay.h"
-#include "spi_device.h"
-#include "uart_device.h" 
+
 
 #endif // __OSAL_ERROR_H__

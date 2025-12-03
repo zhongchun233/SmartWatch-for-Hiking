@@ -173,7 +173,7 @@ static void UART_device_destroy(BaseDevice* self) {
 }
 
 // UART设备创建函数（构造函数）
-BaseDevice* UART_device_create(UARTConfig* config) {
+BaseDevice* uart_device_create(UARTConfig* config) {
 	
 UARTDevice* UART_dev = (UARTDevice*)osal_heap_malloc(sizeof(UARTDevice));
     
@@ -196,6 +196,7 @@ UARTDevice* UART_dev = (UARTDevice*)osal_heap_malloc(sizeof(UARTDevice));
     UART_dev->base.ioctl = UART_device_ioctl;
     UART_dev->base.destroy = UART_device_destroy;
     int32_t ret = osal_mutex_create(&UART_dev->base.Device_mutex);
+		UART_device_init((BaseDevice*)UART_dev,config);
 		if (ret != OSAL_SUCCESS) {
         log_e("UART_device_create: create mutex failed ");
         osal_heap_free(UART_dev);  // 回滚内存，避免泄漏

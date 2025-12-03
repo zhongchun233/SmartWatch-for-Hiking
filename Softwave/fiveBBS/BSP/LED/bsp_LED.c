@@ -111,55 +111,13 @@ led_status_t led_on_off(led_operation_t led_operation)
  */
 void led_task_func(void *argument)
 {
-    led_status_t led_ret = LED_OK;          // 存储led_on_off函数的执行结果
-    led_operation_t led_value = LED_ON;     // 存储从队列接收的LED操作指令（默认初始化为点亮）
 
-    // 1. 创建LED消息队列：队列长度10，每个元素为led_operation_t类型（LED操作指令）
-    led_queue = xQueueCreate(10, sizeof(led_operation_t));
-    if (NULL == led_queue)  // 检查队列创建是否成功
-    {
-        log_d("led_queue created failed!\r\n");
-    }
-    else
-    {
-        log_d("led_queue created successfully!\r\n");
-    }
-
-    // 任务主循环（FreeRTOS任务必须包含无限循环，不可退出）
-    for (;;)
-    {
-
-
-        // 检查队列句柄是否有效（避免空指针访问）
-        if (led_queue != 0)
-        {
-            /* 2. 从LED队列接收消息（非阻塞模式）
-             * 参数1：队列句柄（led_queue）
-             * 参数2：接收数据缓冲区（存储读取到的LED操作指令）
-             * 参数3：超时时间（0ms=非阻塞，无消息则立即返回）
-             */
-
-            if (pdTRUE == xQueueReceive(led_queue,&(led_value),(TickType_t)0))
-            {
-                // 调试打印：成功接收队列消息（指令值+当前系统时间）
-                log_d("received led_queue value = [%d] at time [%d]  \r\n",led_value, HAL_GetTick());
-
-                // 3. 调用LED核心操作函数，执行对应指令
-                led_ret = led_on_off(led_value);
-
-                // 检查操作是否成功
-                if (LED_OK == led_ret)
-                {
-                    log_d("led_on_off successfully at time [%d] \r\n", HAL_GetTick());
-                }
-            }
-						else{
-//											  log_d("led_queue fail \r\n"); 
-						}
-        }
-
-        osDelay(1000);  // 任务延时100ms（降低CPU占用率，FreeRTOS标准延时函数）
-    }
+	for(;;)
+	{
+		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
+		osDelay(1000);	
+	
+	}
     /* USER CODE END 5 */
 }
 void Green_led_task_func(void *argument)
@@ -168,7 +126,10 @@ void Green_led_task_func(void *argument)
 	{
 		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
 		osDelay(1000);	
-	
+	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
+		osDelay(1000);	
+			HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_1);
+		osDelay(1000);	
 	}
 
 

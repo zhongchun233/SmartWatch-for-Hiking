@@ -99,19 +99,19 @@ int main(void)
   MX_ADC1_Init();
   MX_USART1_UART_Init();
   MX_I2C1_Init();
-  MX_SDIO_SD_Init();
+//  MX_SDIO_SD_Init();
   MX_SPI1_Init();
   MX_USART3_UART_Init();
   MX_USB_PCD_Init();
   /* USER CODE BEGIN 2 */
 	Debug_Init();
 	app_periph_init();
-  led_TaskHandle = osThreadNew(led_task_func, NULL, &led_Task_attributes);
-//	Green_led_TaskHandle = osThreadNew(Green_led_task_func, NULL, &Green_led_Task_attributes);
+//  led_TaskHandle = osThreadNew(led_task_func, NULL, &led_Task_attributes);
+	Green_led_TaskHandle = osThreadNew(Green_led_task_func, NULL, &Green_led_Task_attributes);
 
-HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
-HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
-HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_SET);
   /* USER CODE END 2 */
 
   /* Init scheduler */

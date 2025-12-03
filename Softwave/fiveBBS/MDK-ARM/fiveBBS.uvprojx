@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xE</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../Middlewares/easylogger/inc;../Debug;../Middlewares/SEEGGER/Config;../Middlewares/SEEGGER/RTT;../BSP/Button;../BSP/ili9341_LCD;../BSP/LED;../Middlewares/Function;../BSP/Platform_Interface/Button;../APP_Platform/User_Init;../OS_Platform/OS_Wrapper/inc;../OS_Platform/OS_Implementation/FreeRTOS/inc;../Middlewares/os_adapter/inc;../APP_Platform/User_Init/Platform_IO_Register;../APP_Platform/User_Init/User_Task_Config;../MCU_Platform/MCU_Core_GPIO;../MCU_Platform/MCU_Core_IIC;../MCU_Platform/MCU_Core_SPI;..\MCU_Platform\Protocol_driver_Port;..\MCU_Platform\MCU_Core_soft_IIC;..\MCU_Platform\MCU_Core_delay;..\MCU_Platform\MCU_Core_Uart</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../Middlewares/easylogger/inc;../Debug;../Middlewares/SEEGGER/Config;../Middlewares/SEEGGER/RTT;../BSP/Button;../BSP/ili9341_LCD;../BSP/LED;..\Middlewares\Function\circular_buffer;../BSP/Platform_Interface/Button;../APP_Platform/User_Init;../OS_Platform/OS_Wrapper/inc;../OS_Platform/OS_Implementation/FreeRTOS/inc;../Middlewares/os_adapter/inc;../APP_Platform/User_Init/Platform_IO_Register;../APP_Platform/User_Init/User_Task_Config;../MCU_Platform/MCU_Core_GPIO;../MCU_Platform/MCU_Core_IIC;../MCU_Platform/MCU_Core_SPI;..\MCU_Platform\Protocol_driver_Port;..\MCU_Platform\MCU_Core_soft_IIC;..\MCU_Platform\MCU_Core_delay;..\MCU_Platform\MCU_Core_Uart;..\BSP\uart_driver;..\APP_Platform\UART_Parse</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1271,6 +1271,11 @@
               <FileType>1</FileType>
               <FilePath>..\BSP\Button\bsp_multi_button.c</FilePath>
             </File>
+            <File>
+              <FileName>bsp_uart_driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\uart_driver\bsp_uart_driver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1355,6 +1360,11 @@
               <FileName>user_periph_setup.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\APP_Platform\User_Init\Platform_IO_Register\user_periph_setup.c</FilePath>
+            </File>
+            <File>
+              <FileName>uart_parse_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP_Platform\UART_Parse\uart_parse_task.c</FilePath>
             </File>
           </Files>
         </Group>

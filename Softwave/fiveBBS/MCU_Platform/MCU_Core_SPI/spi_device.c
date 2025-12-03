@@ -29,7 +29,7 @@
 
 #include "spi.h"   // hardware i2c
 
-
+#include "spi_device.h"
 #include "osal_mutex.h"
 #include "osal_internal_mutex.h"
 #include "osal_heap.h"

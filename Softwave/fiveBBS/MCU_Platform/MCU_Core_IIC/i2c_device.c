@@ -27,6 +27,7 @@
 //******************************** Includes *********************************//
 #include "Protocol_driver_Port.h"
 #include "soft_i2c_device.h"   // hardware i2c
+#include "i2c_device.h"   // hardware i2c
 #include "i2c.h"   // hardware i2c
 
 #include "osal_mutex.h"

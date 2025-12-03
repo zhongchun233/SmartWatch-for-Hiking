@@ -25,8 +25,9 @@
  * 
  *****************************************************************************/
 #include "Protocol_driver_Port.h"
-
-
+#include "gpio_device.h"
+#include "soft_i2c_device.h"   // hardware i2c
+#include "delay.h"
 #include "stm32f1xx_hal.h"
 /**
   * @brief SDA线输入模式配置

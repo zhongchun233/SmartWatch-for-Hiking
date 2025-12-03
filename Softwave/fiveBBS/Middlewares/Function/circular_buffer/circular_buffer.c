@@ -18,7 +18,7 @@ circular_buffer_t * create_empty_circular_buffer (void)
     p_buffer_temp = (circular_buffer_t *) malloc(sizeof(circular_buffer_t));
     if ( NULL == p_buffer_temp ) 
     {
-        log_e("error: create_empty_circular_buffer - 内存分配失败");
+        log_e("error: create_empty_circular_buffer ");
         return NULL;
     }
     
@@ -45,7 +45,7 @@ uint8_t buffer_is_empty (circular_buffer_t * p_buffer)
     // 输入参数合法性检查：缓冲区指针不能为NULL
     if ( NULL == p_buffer )
     {
-        log_e("buffer_is_empty - 输入缓冲区指针为NULL");
+        log_e("buffer*_is_NULL ");
         return 0xFF;
     }        
     // 核心判定逻辑：head == tail 表示缓冲区无数据
@@ -77,7 +77,7 @@ uint8_t buffer_is_full (circular_buffer_t * p_buffer)
     // 输入参数合法性检查：缓冲区指针不能为NULL
     if ( NULL == p_buffer )
     {
-        log_e("buffer_is_full - 输入缓冲区指针为NULL");
+        log_e("buffer*_is_NULL ");
         return 0xFF;
     }  
     // 核心判定逻辑：head的下一个位置（模缓冲区大小）等于tail位置，表示缓冲区已满
@@ -113,13 +113,13 @@ uint8_t insert_data (circular_buffer_t * p_buffer, data_type_t data)
     // 输入参数合法性检查：缓冲区指针不能为NULL
     if ( NULL == p_buffer )
     {
-        log_e("insert_data - 输入缓冲区指针为NULL");
+        log_e("insert_data");
         return 0xFF;
     }
     // 检查缓冲区是否已满，满则返回错误
     if( 0x00 == buffer_is_full(p_buffer) )
     {
-        log_w("insert_data - 缓冲区已满，无法插入数据");
+        log_w("buffer_is_full ");
         return 0xFE;
     }
     
@@ -152,13 +152,13 @@ uint8_t get_data (circular_buffer_t * p_buffer, data_type_t * data)
     // 输入参数合法性检查：缓冲区指针不能为NULL
     if ( NULL == p_buffer )
     {
-        log_e("get_data - 输入缓冲区指针为NULL");
+        log_e("buffer* IS NULL");
         return 0xFF;
     }
     // 检查缓冲区是否为空，空则返回错误
     if( 0x00 == buffer_is_empty(p_buffer) )
     {
-        log_w("get_data - 缓冲区为空，无数据可读取");
+        log_w("get_data IS empty");
         return 0xFE;
     }
     // 从tail指针当前指向的位置读取数据（通过模运算确保索引在缓冲区范围内）
@@ -168,3 +168,54 @@ uint8_t get_data (circular_buffer_t * p_buffer, data_type_t * data)
     
     return 0x00;
 }
+
+
+/**
+ * @brief get_the_head_pos.
+ * 
+ *  
+ * @param[in] circular_buffer_t : Pointer to the target of handler.
+ * @param[in] head : Pointer to the head storage varibale.
+ * 
+ * @return      uint8_t : 
+                        0xff:error, the buffer pointer is NULL;
+                        0xfe:error, the buffer is empty;
+                        0x00:success
+                        0x01:failed
+ * 
+ * */
+uint8_t get_head_pos   (circular_buffer_t * p_buffer,uint32_t * head)
+{
+    if ( NULL == p_buffer )
+    {
+        return 0xFF;
+    }
+    *head = p_buffer->head;
+    
+    return 0x00;
+}
+/**
+ * @brief head pos. increment.
+ * 
+ *  
+ * @param[in] circular_buffer_t : Pointer to the target of handler.
+ * @param[in] increament_num : increment number.
+* @return      uint8_t : 
+                        0xff:error, the buffer pointer is NULL;
+                        0xfe:error, the buffer is empty;
+                        0x00:success
+                        0x01:failed
+ * 
+ * */
+uint8_t  head_pos_increment         (circular_buffer_t * p_buffer,\
+                                            uint32_t increament_num)
+{
+    if ( NULL == p_buffer )
+    {
+        return 0xFF;
+    }
+    p_buffer->head += increament_num;
+    
+    return 0x00;
+}
+

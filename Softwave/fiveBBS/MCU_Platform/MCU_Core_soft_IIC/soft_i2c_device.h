@@ -22,8 +22,8 @@
  * 
  *****************************************************************************/
  
-#ifndef __soft_i2c_device_H__  /* Avoid repeated inclusion */
-#define __soft_i2c_device_H__
+#ifndef __Soft_i2c_device_H__  /* Avoid repeated inclusion */
+#define __Soft_i2c_device_H__
 
 
 #include "gpio_device.h"
