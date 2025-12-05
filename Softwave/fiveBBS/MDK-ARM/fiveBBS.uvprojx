@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xE</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../Middlewares/easylogger/inc;../Debug;../Middlewares/SEEGGER/Config;../Middlewares/SEEGGER/RTT;../BSP/Button;../BSP/ili9341_LCD;../BSP/LED;..\Middlewares\Function\circular_buffer;../BSP/Platform_Interface/Button;../APP_Platform/User_Init;../OS_Platform/OS_Wrapper/inc;../OS_Platform/OS_Implementation/FreeRTOS/inc;../Middlewares/os_adapter/inc;../APP_Platform/User_Init/Platform_IO_Register;../APP_Platform/User_Init/User_Task_Config;../MCU_Platform/MCU_Core_GPIO;../MCU_Platform/MCU_Core_IIC;../MCU_Platform/MCU_Core_SPI;..\MCU_Platform\Protocol_driver_Port;..\MCU_Platform\MCU_Core_soft_IIC;..\MCU_Platform\MCU_Core_delay;..\MCU_Platform\MCU_Core_Uart;..\BSP\uart_driver;..\APP_Platform\UART_Parse</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../Middlewares/easylogger/inc;../Debug;../Middlewares/SEEGGER/Config;../Middlewares/SEEGGER/RTT;../BSP/Button;../BSP/ili9341_LCD;../BSP/LED;..\Middlewares\Function\circular_buffer;../BSP/Platform_Interface/Button;../APP_Platform/User_Init;../OS_Platform/OS_Wrapper/inc;../OS_Platform/OS_Implementation/FreeRTOS/inc;../Middlewares/os_adapter/inc;../APP_Platform/User_Init/Platform_IO_Register;../APP_Platform/User_Init/User_Task_Config;../MCU_Platform/MCU_Core_GPIO;../MCU_Platform/MCU_Core_IIC;../MCU_Platform/MCU_Core_SPI;..\MCU_Platform\Protocol_driver_Port;..\MCU_Platform\MCU_Core_soft_IIC;..\MCU_Platform\MCU_Core_delay;..\MCU_Platform\MCU_Core_Uart;..\BSP\uart_driver;..\APP_Platform\UART_Parse;..\Middlewares\SystemView\Config;..\Middlewares\SystemView\Sample\FreeRTOSV10;..\Middlewares\SystemView\SEGGER</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1311,16 +1311,6 @@
               <FileType>1</FileType>
               <FilePath>..\Middlewares\easylogger\port\elog_port.c</FilePath>
             </File>
-            <File>
-              <FileName>SEGGER_RTT.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Middlewares\SEEGGER\RTT\SEGGER_RTT.c</FilePath>
-            </File>
-            <File>
-              <FileName>SEGGER_RTT_printf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Middlewares\SEEGGER\RTT\SEGGER_RTT_printf.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1475,6 +1465,31 @@
               <FileName>Protocol_driver_Port.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\MCU_Platform\Protocol_driver_Port\Protocol_driver_Port.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Middlewares/SystemView</GroupName>
+          <Files>
+            <File>
+              <FileName>SEGGER_SYSVIEW_FreeRTOS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\SystemView\Sample\FreeRTOSV10\SEGGER_SYSVIEW_FreeRTOS.c</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_SYSVIEW.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\SystemView\SEGGER\SEGGER_SYSVIEW.c</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_RTT_printf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\SystemView\SEGGER\SEGGER_RTT_printf.c</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_RTT.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\SystemView\SEGGER\SEGGER_RTT.c</FilePath>
             </File>
           </Files>
         </Group>

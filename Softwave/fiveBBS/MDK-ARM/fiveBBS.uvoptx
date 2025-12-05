@@ -134,13 +134,8 @@
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
-          <Key>DLGUARM</Key>
-          <Name>$</Name>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
           <Key>JL2CM3</Key>
-          <Name>-U63728769 -O78 -S2 -ZTIFSpeedSel5000 -A0 -C0 -JU1 -JI127.0.0.1 -JP0 -RST0 -N00("ARM CoreSight SW-DP") -D00(1BA01477) -L00(0) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -TB1 -TFE0 -FO15 -FD20000000 -FC1000 -FN1 -FF0STM32F10x_512.FLM -FS08000000 -FL080000 -FP0($$Device:STM32F103VE$Flash\STM32F10x_512.FLM)</Name>
+          <Name>-U63728769 -O78 -S0 -ZTIFSpeedSel20000 -A0 -C0 -JU1 -JI127.0.0.1 -JP0 -RST0 -N00("ARM CoreSight SW-DP") -D00(1BA01477) -L00(0) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -TB1 -TFE0 -FO15 -FD20000000 -FC1000 -FN1 -FF0STM32F10x_512.FLM -FS08000000 -FL080000 -FP0($$Device:STM32F103VE$Flash\STM32F10x_512.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -157,23 +152,23 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>66</LineNumber>
+          <LineNumber>87</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134232454</Address>
+          <Address>134238836</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\APP_Platform\User_Init\Platform_IO_Register\user_periph_setup.c</Filename>
+          <Filename>../Core/Src/main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\fiveBBS\../APP_Platform/User_Init/Platform_IO_Register/user_periph_setup.c\66</Expression>
+          <Expression>\\fiveBBS\../Core/Src/main.c\87</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>63</LineNumber>
+          <LineNumber>88</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>0</Address>
           <ByteObject>0</ByteObject>
@@ -182,119 +177,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\APP_Platform\User_Init\User_Task_Config\user_task_reso_config.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>75</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\APP_Platform\User_Init\user_init.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>139</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\APP_Platform\User_Init\user_init.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>4</Number>
-          <Type>0</Type>
-          <LineNumber>134</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\BSP\LED\bsp_LED.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>5</Number>
-          <Type>0</Type>
-          <LineNumber>136</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\BSP\LED\bsp_LED.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>6</Number>
-          <Type>0</Type>
-          <LineNumber>128</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\MCU_Platform\MCU_Core_Uart\uart_device.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>7</Number>
-          <Type>0</Type>
-          <LineNumber>175</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>startup_stm32f103xe.s</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>8</Number>
-          <Type>0</Type>
-          <LineNumber>289</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>startup_stm32f103xe.s</Filename>
+          <Filename>../Core/Src/main.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -1089,30 +972,6 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
-    <File>
-      <GroupNumber>7</GroupNumber>
-      <FileNumber>58</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\Middlewares\SEEGGER\RTT\SEGGER_RTT.c</PathWithFileName>
-      <FilenameWithoutPath>SEGGER_RTT.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>7</GroupNumber>
-      <FileNumber>59</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\Middlewares\SEEGGER\RTT\SEGGER_RTT_printf.c</PathWithFileName>
-      <FilenameWithoutPath>SEGGER_RTT_printf.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
   </Group>
 
   <Group>
@@ -1123,7 +982,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>8</GroupNumber>
-      <FileNumber>60</FileNumber>
+      <FileNumber>58</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1143,7 +1002,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>9</GroupNumber>
-      <FileNumber>61</FileNumber>
+      <FileNumber>59</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1163,7 +1022,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>10</GroupNumber>
-      <FileNumber>62</FileNumber>
+      <FileNumber>60</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1175,7 +1034,7 @@
     </File>
     <File>
       <GroupNumber>10</GroupNumber>
-      <FileNumber>63</FileNumber>
+      <FileNumber>61</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1187,7 +1046,7 @@
     </File>
     <File>
       <GroupNumber>10</GroupNumber>
-      <FileNumber>64</FileNumber>
+      <FileNumber>62</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1199,7 +1058,7 @@
     </File>
     <File>
       <GroupNumber>10</GroupNumber>
-      <FileNumber>65</FileNumber>
+      <FileNumber>63</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1219,7 +1078,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>66</FileNumber>
+      <FileNumber>64</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1231,7 +1090,7 @@
     </File>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>67</FileNumber>
+      <FileNumber>65</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1243,7 +1102,7 @@
     </File>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>68</FileNumber>
+      <FileNumber>66</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1255,7 +1114,7 @@
     </File>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>69</FileNumber>
+      <FileNumber>67</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1267,7 +1126,7 @@
     </File>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>70</FileNumber>
+      <FileNumber>68</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1279,7 +1138,7 @@
     </File>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>71</FileNumber>
+      <FileNumber>69</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1299,7 +1158,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>12</GroupNumber>
-      <FileNumber>72</FileNumber>
+      <FileNumber>70</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1311,7 +1170,7 @@
     </File>
     <File>
       <GroupNumber>12</GroupNumber>
-      <FileNumber>73</FileNumber>
+      <FileNumber>71</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1323,7 +1182,7 @@
     </File>
     <File>
       <GroupNumber>12</GroupNumber>
-      <FileNumber>74</FileNumber>
+      <FileNumber>72</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1335,7 +1194,7 @@
     </File>
     <File>
       <GroupNumber>12</GroupNumber>
-      <FileNumber>75</FileNumber>
+      <FileNumber>73</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1347,7 +1206,7 @@
     </File>
     <File>
       <GroupNumber>12</GroupNumber>
-      <FileNumber>76</FileNumber>
+      <FileNumber>74</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1359,7 +1218,7 @@
     </File>
     <File>
       <GroupNumber>12</GroupNumber>
-      <FileNumber>77</FileNumber>
+      <FileNumber>75</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1379,7 +1238,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>13</GroupNumber>
-      <FileNumber>78</FileNumber>
+      <FileNumber>76</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1391,7 +1250,7 @@
     </File>
     <File>
       <GroupNumber>13</GroupNumber>
-      <FileNumber>79</FileNumber>
+      <FileNumber>77</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1403,7 +1262,7 @@
     </File>
     <File>
       <GroupNumber>13</GroupNumber>
-      <FileNumber>80</FileNumber>
+      <FileNumber>78</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1415,7 +1274,7 @@
     </File>
     <File>
       <GroupNumber>13</GroupNumber>
-      <FileNumber>81</FileNumber>
+      <FileNumber>79</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1427,7 +1286,7 @@
     </File>
     <File>
       <GroupNumber>13</GroupNumber>
-      <FileNumber>82</FileNumber>
+      <FileNumber>80</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1439,7 +1298,7 @@
     </File>
     <File>
       <GroupNumber>13</GroupNumber>
-      <FileNumber>83</FileNumber>
+      <FileNumber>81</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1451,13 +1310,69 @@
     </File>
     <File>
       <GroupNumber>13</GroupNumber>
-      <FileNumber>84</FileNumber>
+      <FileNumber>82</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\MCU_Platform\Protocol_driver_Port\Protocol_driver_Port.c</PathWithFileName>
       <FilenameWithoutPath>Protocol_driver_Port.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>Middlewares/SystemView</GroupName>
+    <tvExp>1</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>83</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\Middlewares\SystemView\Sample\FreeRTOSV10\SEGGER_SYSVIEW_FreeRTOS.c</PathWithFileName>
+      <FilenameWithoutPath>SEGGER_SYSVIEW_FreeRTOS.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>84</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>1</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\Middlewares\SystemView\SEGGER\SEGGER_SYSVIEW.c</PathWithFileName>
+      <FilenameWithoutPath>SEGGER_SYSVIEW.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>85</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>1</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\Middlewares\SystemView\SEGGER\SEGGER_RTT_printf.c</PathWithFileName>
+      <FilenameWithoutPath>SEGGER_RTT_printf.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>86</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\Middlewares\SystemView\SEGGER\SEGGER_RTT.c</PathWithFileName>
+      <FilenameWithoutPath>SEGGER_RTT.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

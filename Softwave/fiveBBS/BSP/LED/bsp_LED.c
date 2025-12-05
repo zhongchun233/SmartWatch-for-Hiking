@@ -125,11 +125,11 @@ void Green_led_task_func(void *argument)
 	for(;;)
 	{
 		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
-		osDelay(1000);	
+		osDelay(500);	
 	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
-		osDelay(1000);	
+		osDelay(500);	
 			HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_1);
-		osDelay(1000);	
+		osDelay(500);	
 	}
 
 
