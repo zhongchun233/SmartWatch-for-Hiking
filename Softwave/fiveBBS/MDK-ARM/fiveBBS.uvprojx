@@ -1491,6 +1491,11 @@
               <FileType>1</FileType>
               <FilePath>..\Middlewares\SystemView\SEGGER\SEGGER_RTT.c</FilePath>
             </File>
+            <File>
+              <FileName>SEGGER_SYSVIEW_Config_FreeRTOS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\SystemView\Sample\FreeRTOSV10\Config\Cortex-M\SEGGER_SYSVIEW_Config_FreeRTOS.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

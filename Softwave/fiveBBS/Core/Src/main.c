@@ -105,7 +105,7 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USB_PCD_Init();
   /* USER CODE BEGIN 2 */
-//	SEGGER_SYSVIEW_Conf(); 
+	SEGGER_SYSVIEW_Conf(); 
 	Debug_Init();
 	app_periph_init();
 //  led_TaskHandle = osThreadNew(led_task_func, NULL, &led_Task_attributes);
