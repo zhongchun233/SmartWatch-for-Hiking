@@ -22,37 +22,30 @@
  * 
  *****************************************************************************/
  
-#ifndef __UART_DEVICE_H__  /* Avoid repeated inclusion */
-#define __UART_DEVICE_H__
+#ifndef __DMA_DEVICE_H__  /* Avoid repeated inclusion */
+#define __DMA_DEVICE_H__
 
 
 //******************************** Includes *********************************//
-
-#include "gpio_device.h"
-#include "os_freertos.h"
-#include "osal_mutex.h"
 
 #include "Protocol_driver_Port.h"
 //******************************** Includes *********************************//
 //******************************** Typedefs *********************************//
-typedef struct UART_HandleTypeDef UART_device_HandleTypeDef;
 typedef struct DMA_HandleTypeDef DMA_device_HandleTypeDef;
-// I2C配置结构体（抽象版，仅保留核心参数）
-typedef struct {
-    UART_device_HandleTypeDef* UART_handle;  // UART硬件句柄（指针类型，支持前置声明）
-		DMA_device_HandleTypeDef* DMA_handle; // DMA硬件句柄(指针类型)
-		bool Enable_DMA;
-    uint32_t timeout_ms;            // 通信超时时间（ms）
-} UARTConfig;
-// uart_device.h
-typedef struct {
-    BaseDevice base;
-    UART_device_HandleTypeDef* UART_handle;
-    uint32_t timeout_ms;
-} UARTDevice;
+//// I2C配置结构体（抽象版，仅保留核心参数）
+//typedef struct {
+//    DMA_device_HandleTypeDef* DMA_handle;  // DMA硬件句柄（指针类型，支持前置声明）
+//    uint32_t timeout_ms;            // 通信超时时间（ms）
+//} DMAConfig;
+//// DMA_device.h
+//typedef struct {
+//    BaseDevice base;
+//    DMA_device_HandleTypeDef* DMA_handle;
+//    uint32_t timeout_ms;
+//} DMADevice;
 
 // SPI设备创建函数
-BaseDevice* uart_device_create(UARTConfig* config);
+BaseDevice* DMA_device_create(DMA_device_HandleTypeDef* config);
 
 //******************************** Typedefs *********************************//
 
