@@ -35,7 +35,7 @@
  */
 ElogErrCode elog_port_init(void) {
     ElogErrCode result = ELOG_NO_ERR;
-//		SEGGER_RTT_Init();
+		SEGGER_RTT_Init();
     /* add your code here */
     
     return result;
@@ -60,7 +60,7 @@ void elog_port_deinit(void) {
 void elog_port_output(const char *log, size_t size) {
     
     /* add your code here */
-//    SEGGER_RTT_Write(0,log,size);
+    SEGGER_RTT_Write(0,log,size);
 }
 
 /**

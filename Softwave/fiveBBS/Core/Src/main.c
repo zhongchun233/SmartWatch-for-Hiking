@@ -36,6 +36,7 @@
 #include "bsp_LED.h" 
 #include "user_periph_setup.h"
 #include "SEGGER_SYSVIEW.h"
+#include "bsp_uart_driver.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -104,18 +105,22 @@ int main(void)
   MX_ADC1_Init();
   MX_USART1_UART_Init();
   MX_I2C1_Init();
-  MX_SDIO_SD_Init();
+//  MX_SDIO_SD_Init();
   MX_SPI1_Init();
   MX_USART3_UART_Init();
   MX_USB_PCD_Init();
   MX_CRC_Init();
-  MX_WWDG_Init();
+//  MX_WWDG_Init();
   /* USER CODE BEGIN 2 */
-	SEGGER_SYSVIEW_Conf(); 
+//	SEGGER_SYSVIEW_Conf(); 
 	Debug_Init();
 	app_periph_init();
 //  led_TaskHandle = osThreadNew(led_task_func, NULL, &led_Task_attributes);
 	Green_led_TaskHandle = osThreadNew(Green_led_task_func, NULL, &Green_led_Task_attributes);
+	BSP_uart_driver_func_TaskHandle = osThreadNew(BSP_uart_driver_func, 
+																								NULL, 
+																								&BSP_uart_driver_func_attributes
+																								);
 
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);

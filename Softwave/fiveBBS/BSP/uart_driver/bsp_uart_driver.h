@@ -12,7 +12,7 @@
 #include "circular_buffer.h"
 #include "elog.h"
 
-void uart_driver_func(void *argument);
+void BSP_uart_driver_func(void *argument);
 
 
 circular_buffer_t * get_circular_buffer(void);

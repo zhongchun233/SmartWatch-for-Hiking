@@ -32,11 +32,11 @@
 //****************************************************************************//
 
 //********************* FreeRTOS任务相关定义 **********************//
-osThreadId_t led_TaskHandle;  // LED任务句柄（用于操作任务，如暂停、删除）
+osThreadId_t BSP_uart_driver_func_TaskHandle;  // LED任务句柄（用于操作任务，如暂停、删除）
 osThreadId_t Green_led_TaskHandle;  // LED任务句柄（用于操作任务，如暂停、删除）
 // LED任务属性配置结构体（FreeRTOS任务创建必需）
-const osThreadAttr_t led_Task_attributes = {
-  .name = "led_Task",          // 任务名称（调试用，便于识别）
+const osThreadAttr_t BSP_uart_driver_func_attributes = {
+  .name = "BSP_uart_Task",          // 任务名称（调试用，便于识别）
   .stack_size = 128 * 4,       // 任务栈大小：128字 × 4字节/字 = 512字节（足够LED控制逻辑）
   .priority = (osPriority_t) osPriorityHigh,  // 任务优先级：高优先级（确保LED响应及时）
 };
