@@ -39,9 +39,9 @@
 
 //******************************** Defines **********************************//
 //*********************Thread_Func **********************//
-extern osThreadId_t led_TaskHandle;
+extern osThreadId_t BSP_uart_driver_func_TaskHandle;
 extern osThreadId_t Green_led_TaskHandle;  // LED任务句柄（用于操作任务，如暂停、删除）
-extern const osThreadAttr_t led_Task_attributes;
+extern const osThreadAttr_t BSP_uart_driver_func_attributes;
 extern const osThreadAttr_t Green_led_Task_attributes;
 #define LED_Pin GPIO_PIN_5
 #define LED_GPIO_Port GPIOB

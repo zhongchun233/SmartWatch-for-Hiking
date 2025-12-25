@@ -56,6 +56,7 @@ static int UART_device_init(BaseDevice* self, void* config) {
     // 初始化UART设备特定数据
     UART_dev->UART_handle = cfg->UART_handle;
     UART_dev->timeout_ms = cfg->timeout_ms;
+		
 		HAL_UART_MspInit((UART_HandleTypeDef *)UART_dev->UART_handle);
     
     self->state = DEVICE_STATE_READY;
