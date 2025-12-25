@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.0.3 Chrome/140.0.7339.249 Electron/38.7.0 Safari/537.36" version="29.0.3" pages="2">
   <diagram name="第 1 页" id="PiEqJmlqJlTppJE-NWJI">
-    <mxGraphModel dx="11774" dy="5803" grid="1" gridSize="10" guides="0" tooltips="1" connect="0" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+    <mxGraphModel dx="10077" dy="4802" grid="1" gridSize="10" guides="0" tooltips="1" connect="0" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -1109,6 +1109,9 @@
         </mxCell>
         <mxCell id="R3dUeKAtdG_e_NewdbYM-453" value="&lt;span style=&quot;font-family: Optima, &amp;quot;Microsoft YaHei&amp;quot;, PingFangSC-regular, serif; letter-spacing: 0.32px; text-align: left;&quot;&gt;&lt;font&gt;马太效应&lt;/font&gt;&lt;/span&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=51;fontStyle=1;fontColor=#FF9999;labelBackgroundColor=none;" vertex="1" parent="1">
           <mxGeometry x="-2418" y="-494" width="230" height="98" as="geometry" />
+        </mxCell>
+        <mxCell id="R3dUeKAtdG_e_NewdbYM-454" value="" style="shape=image;html=1;verticalLabelPosition=bottom;verticalAlign=top;imageAspect=1;aspect=fixed;image=img/clipart/Gear_128x128.png" vertex="1" parent="1">
+          <mxGeometry x="-2500" y="-420" width="52" height="61" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
